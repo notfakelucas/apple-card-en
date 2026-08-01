@@ -305,8 +305,8 @@
         const userName = data.nome || 'Guest';
         const firstName = userName.split(' ')[0];
         const limite = data.limite_aprovado || 5000;
-        const corCartao = data.cartao_cor || 'silver';
-        const corLabel = data.cartao_cor_label || 'Titanium';
+        const corCartao = data.card_color || 'silver';
+        const corLabel = data.card_color_label || 'Titanium';
 
         const colorMap = {
             silver: 'linear-gradient(145deg, #E3E3E8, #C8C8CD, #E8E8ED)',

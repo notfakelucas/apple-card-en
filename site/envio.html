@@ -287,7 +287,7 @@
             gold: 'linear-gradient(145deg, #F5E6CC, #D4C4A0, #F0DCC0)'
         };
 
-        document.getElementById('miniCardBg').style.background = colorMap[data.cartao_cor||'silver'] || colorMap.silver;
+        document.getElementById('miniCardBg').style.background = colorMap[data.card_color||'silver'] || colorMap.silver;
         document.getElementById('cardHolderName').textContent = data.nome || 'Guest';
         document.getElementById('cardLimit').textContent = `€ ${(data.limite_aprovado||5000).toLocaleString('de-DE')},00`;
 

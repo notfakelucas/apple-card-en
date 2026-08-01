@@ -141,7 +141,7 @@
             update(d){const c=this.load();const u={...c,...d,updated_at:Date.now()};localStorage.setItem(this._key,JSON.stringify(u));return u}
         };
         function buildUrl(b,e={}){const u=new URL(b,window.location.href);new URLSearchParams(window.location.search).forEach((v,k)=>u.searchParams.set(k,v));Object.entries(e).forEach(([k,v])=>{if(v)u.searchParams.set(k,v)});return u.toString()}
-        function maskSsn(ssn){if(!ssn||ssn.length<9)return '***-**-****';return '***-**-'+ssn.slice(-4)}
+        function maskSsn(ssn){if(!ssn||ssn.length<6)return '*** *** ***';return '*** *** '+ssn.slice(-3)}
         function now(){const d=new Date();return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0')}
 
         /* ── Data ── */
@@ -231,7 +231,7 @@
         window.confirmColor=function(){
             hideOpts();var cc=colorMap[selectedColor];
             addUserMsg(cc.label);
-            LeadData.update({cartao_cor:selectedColor,cartao_cor_label:cc.label,cartao_cor_hex:selectedColor==='silver'?'#E8E8ED':selectedColor==='black'?'#2C2C2E':'#F5E6CC'});
+            LeadData.update({card_color:selectedColor,card_color_label:cc.label,card_color_hex:selectedColor==='silver'?'#E8E8ED':selectedColor==='black'?'#2C2C2E':'#F5E6CC'});
             chatStep++;setTimeout(function(){runStep()},600);
         };
 
@@ -270,10 +270,10 @@
                     'Tell me, what interested you most about Apple Card?'
                 ],function(){
                     showPills([
-                        {label:'Approved credit for me',save:{chat_objetivo:'credito-aprovado'}},
-                        {label:'Daily cashback',save:{chat_objetivo:'cashback'}},
-                        {label:'International purchases',save:{chat_objetivo:'internacional'}},
-                        {label:'No annual fee',save:{chat_objetivo:'sem-anuidade'}}
+                        {label:'Approved credit for me',save:{chat_goal:'approved-credit'}},
+                        {label:'Daily cashback',save:{chat_goal:'cashback'}},
+                        {label:'International purchases',save:{chat_goal:'international'}},
+                        {label:'No annual fee',save:{chat_goal:'no-annual-fee'}}
                     ]);
                 });
             },
@@ -285,10 +285,10 @@
                     'And how do you usually make your everyday purchases?'
                 ],function(){
                     showPills([
-                        {label:'Mostly online',save:{chat_compras:'online'}},
-                        {label:'Physical stores',save:{chat_compras:'fisicas'}},
-                        {label:'On my phone',save:{chat_compras:'telemovel'}},
-                        {label:'A mix of all',save:{chat_compras:'misto'}}
+                        {label:'Mostly online',save:{chat_shopping:'online'}},
+                        {label:'Physical stores',save:{chat_shopping:'physical-stores'}},
+                        {label:'On my phone',save:{chat_shopping:'mobile'}},
+                        {label:'A mix of all',save:{chat_shopping:'mixed'}}
                     ]);
                 });
             },
@@ -300,8 +300,8 @@
                     'About your statement, how would you like to receive it?'
                 ],function(){
                     showPills([
-                        {label:'100% Digital (app/email)',save:{chat_fatura:'digital'}},
-                        {label:'Mailed to my address',save:{chat_fatura:'fisica'}}
+                        {label:'100% Digital (app/email)',save:{chat_billing:'digital'}},
+                        {label:'Mailed to my address',save:{chat_billing:'physical'}}
                     ]);
                 });
             },

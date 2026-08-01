@@ -112,7 +112,7 @@
 
         const frete = data.frete_valor || parseFloat(params.get('frete')) || 22.45;
         const tipo = data.frete_tipo || params.get('tipo') || 'expresso';
-        const corLabel = data.cartao_cor_label || 'Titanium';
+        const corLabel = data.card_color_label || 'Titanium';
         const txId = data.transaction_id || '—';
 
         document.getElementById('cardColor').textContent = corLabel;

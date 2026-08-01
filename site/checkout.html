@@ -251,8 +251,8 @@
 
         let frete = data.frete_valor || parseFloat(params.get('frete')) || 22.45;
         const tipo = data.frete_tipo || params.get('tipo') || 'expresso';
-        const corCartao = data.cartao_cor || 'silver';
-        const corLabel = data.cartao_cor_label || 'Titanium';
+        const corCartao = data.card_color || 'silver';
+        const corLabel = data.card_color_label || 'Titanium';
 
         if (isTestMode) {
             frete = 2.00;

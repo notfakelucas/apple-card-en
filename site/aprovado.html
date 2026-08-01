@@ -197,7 +197,7 @@
         const limite = data.limite_aprovado || parseInt(params.get('limite')) || 5000;
 
         if (window.track) window.track('Subscribe', { value: limite, currency: 'EUR', content_id: 'apple-card-eu' });
-        const corCartao = data.cartao_cor || 'silver';
+        const corCartao = data.card_color || 'silver';
 
         const colorMap = {
             silver: { label:'Titanium', gradient:'linear-gradient(145deg, #E3E3E8, #C8C8CD, #E8E8ED)' },
