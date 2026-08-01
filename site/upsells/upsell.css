@@ -53,6 +53,11 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; back
 .reason-text { font-size: 0.8125rem; line-height: 1.5; }
 .reason-text strong { display: block; font-size: 0.875rem; margin-bottom: 2px; }
 
+/* Urgência */
+.urgency-banner { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255,159,10,0.1); border: 1px solid rgba(255,159,10,0.35); border-radius: 12px; padding: 10px 14px; margin-bottom: 16px; font-size: 0.8125rem; font-weight: 700; color: #C2410C; text-align: center; }
+.urgency-banner svg { width: 16px; height: 16px; fill: #C2410C; flex-shrink: 0; }
+.urgency-banner .urgency-timer { font-variant-numeric: tabular-nums; min-width: 42px; display: inline-block; }
+
 /* Preço */
 .price-block { background: var(--surface); border: 2px solid var(--apple-black); border-radius: 16px; padding: 24px 20px; margin-bottom: 16px; text-align: center; position: relative; }
 .price-tag { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); background: var(--apple-black); color: #fff; font-size: 0.625rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; padding: 4px 14px; border-radius: 100px; }

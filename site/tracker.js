@@ -1,5 +1,5 @@
 /*
- * Apple Card US — Unified tracking
+ * Apple Card EU — Unified tracking
  *
  *   • Initializes the TikTok Pixel (sdkid D7UKM8JC77U07JNLKKV0).
  *   • Persists UTMs + click ids (ttclid, fbclid, gclid, _ttp) in localStorage.
@@ -86,7 +86,7 @@
 
   function commonProperties(extra) {
     extra = extra || {};
-    if (!('currency' in extra)) extra.currency = 'USD';
+    if (!('currency' in extra)) extra.currency = 'EUR';
     if (!('content_type' in extra)) extra.content_type = 'product';
     return extra;
   }
@@ -207,7 +207,7 @@
       + '<a href="/termos.html" style="color:' + linkColor + ';text-decoration:none;margin:0 6px">Terms</a> · '
       + '<a href="/cookies.html" style="color:' + linkColor + ';text-decoration:none;margin:0 6px">Cookies</a> · '
       + '<a href="mailto:support@apple-card-en.vercel.app" style="color:' + linkColor + ';text-decoration:none;margin:0 6px">Support</a></div>'
-      + '<div>© 2026 Apple Card · Issued by Goldman Sachs Bank USA</div>'
+      + '<div>© 2026 Apple Card · Issued by Goldman Sachs Bank Europe SE</div>'
       + '<div style="margin-top:4px">Payments processed by Cooud · 256-bit SSL</div>';
     document.body.appendChild(f);
   }

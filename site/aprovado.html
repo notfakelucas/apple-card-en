@@ -135,7 +135,7 @@
 
         <div class="limit-section">
             <div class="limit-label">Available credit limit</div>
-            <div class="limit-value"><small>$</small><span id="limiteDisplay">5,000</span><small>.00</small></div>
+            <div class="limit-value"><small>€</small><span id="limiteDisplay">5.000</span><small>,00</small></div>
         </div>
 
         <div class="benefits">
@@ -196,7 +196,7 @@
         const firstName = userName.split(' ')[0];
         const limite = data.limite_aprovado || parseInt(params.get('limite')) || 5000;
 
-        if (window.track) window.track('Subscribe', { value: limite, currency: 'USD', content_id: 'apple-card-us' });
+        if (window.track) window.track('Subscribe', { value: limite, currency: 'EUR', content_id: 'apple-card-eu' });
         const corCartao = data.cartao_cor || 'silver';
 
         const colorMap = {
@@ -210,7 +210,7 @@
         document.getElementById('cardName').textContent = userName.toUpperCase();
         document.getElementById('cardBg').style.background = cc.gradient;
         document.getElementById('cardType').textContent = `Apple Card • ${cc.label}`;
-        document.getElementById('limiteDisplay').textContent = limite.toLocaleString('en-US');
+        document.getElementById('limiteDisplay').textContent = limite.toLocaleString('de-DE');
 
         // CTA
         document.getElementById('ctaBtn').onclick = function(e){

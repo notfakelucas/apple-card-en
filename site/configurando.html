@@ -85,7 +85,7 @@
         function buildUrl(b,e={}){const u=new URL(b,window.location.href);new URLSearchParams(window.location.search).forEach((v,k)=>u.searchParams.set(k,v));Object.entries(e).forEach(([k,v])=>{if(v)u.searchParams.set(k,v)});return u.toString()}
 
         LeadData.update({ page: 'configurando' });
-        if (window.track) window.track('AccountConfiguring', { content_id: 'apple-card-us', currency: 'USD' });
+        if (window.track) window.track('AccountConfiguring', { content_id: 'apple-card-eu', currency: 'EUR' });
         if (window.identifyUser) window.identifyUser();
 
         const timings = [

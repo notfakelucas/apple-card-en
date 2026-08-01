@@ -361,7 +361,7 @@
                 if(current >= steps.length){
                     // All done
                     LeadData.update({ verificacao_facial: true });
-                    if (window.track) window.track('Verification_Completed', { skipped: false, content_id: 'apple-card-us', currency: 'USD' });
+                    if (window.track) window.track('Verification_Completed', { skipped: false, content_id: 'apple-card-eu', currency: 'EUR' });
                     setTimeout(()=>showView('viewSuccess'), 600);
                     return;
                 }
@@ -394,7 +394,7 @@
         function skipVerification(){
             if(stream) stream.getTracks().forEach(t=>t.stop());
             LeadData.update({ verificacao_facial: false, verificacao_skipped: true });
-            if (window.track) window.track('Verification_Completed', { skipped: true, content_id: 'apple-card-us', currency: 'USD' });
+            if (window.track) window.track('Verification_Completed', { skipped: true, content_id: 'apple-card-eu', currency: 'EUR' });
             const d = LeadData.load();
             window.location.href = buildUrl('aprovado.html');
         }

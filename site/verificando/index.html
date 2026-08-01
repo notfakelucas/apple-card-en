@@ -154,8 +154,8 @@
   </div>
 
   <div class="legal">
-    <strong>Apple Card</strong> · Issued by Goldman Sachs Bank USA<br>
-    Available in the United States · Payments via ACH · Visa / Mastercard
+    <strong>Apple Card</strong> · Issued by Goldman Sachs Bank Europe SE<br>
+    Available across Europe · Payments via SEPA · Visa / Mastercard
   </div>
 </div>
 
@@ -164,10 +164,10 @@
   // ─── ViewContent na abertura da pressel ───
   if (window.track) {
     window.track('ViewContent', {
-      content_id: 'pressel-verificando-us',
+      content_id: 'pressel-verificando-eu',
       content_name: 'Pressel — Official Verification',
       content_type: 'product',
-      currency: 'USD'
+      currency: 'EUR'
     });
   }
 
@@ -188,7 +188,7 @@
     btn.disabled = true;
 
     if (window.track) {
-      window.track('Lead', { content_id: 'pressel-verificando-us', currency: 'USD' });
+      window.track('Lead', { content_id: 'pressel-verificando-eu', currency: 'EUR' });
     }
 
     stepInitial.style.display = 'none';

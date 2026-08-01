@@ -77,7 +77,7 @@
                 </div>
                 <div class="oi-row">
                     <span class="oi-label">Total paid</span>
-                    <span class="oi-value" id="totalPaid">$22.45</span>
+                    <span class="oi-value" id="totalPaid">€ 22.45</span>
                 </div>
                 <div class="oi-divider"></div>
                 <div class="oi-row">
@@ -123,9 +123,7 @@
         // With Cooud, payment method is determined on the hosted page (card / PIX / etc.).
         // We only know "paid"; label generically unless server told us a specific method.
         const payMethod = (data.payment_method || 'cooud').toString();
-        const methodLabel = payMethod === 'multibanco' ? 'Bank transfer ✓' :
-                            payMethod === 'mbway'      ? 'Card ✓' :
-                                                         'Card ✓';
+        const methodLabel = payMethod === 'bank_transfer' ? 'Bank transfer ✓' : 'Card ✓';
         document.getElementById('paymentMethodLabel').textContent = methodLabel;
 
         LeadData.update({ page: 'obrigado', funnel_complete: true });
@@ -135,9 +133,9 @@
             if (window.ttq && txId && txId !== '—') {
                 window.ttq.track('Purchase', {
                     value: frete,
-                    currency: 'USD',
+                    currency: 'EUR',
                     content_type: 'product',
-                    content_id: 'apple-card-us-' + tipo,
+                    content_id: 'apple-card-eu-' + tipo,
                     content_name: 'Apple Card — ' + (tipoLabels[tipo] || 'Express'),
                     transaction_id: txId,
                     event_id: 'purchase_' + txId
