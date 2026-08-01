@@ -223,35 +223,69 @@
             letter-spacing: -0.02em;
         }
 
+        .simulator-slider-row {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .simulator-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.18);
+            color: #fff;
+            font-size: 1.25rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            line-height: 1;
+            transition: background 0.2s ease;
+        }
+
+        .simulator-btn:hover {
+            background: rgba(255,255,255,0.22);
+        }
+
+        .simulator-btn:active {
+            background: var(--apple-blue);
+            border-color: var(--apple-blue);
+        }
+
         .simulator-slider {
             -webkit-appearance: none;
             appearance: none;
-            width: 100%;
-            height: 4px;
-            border-radius: 2px;
+            flex: 1;
+            height: 6px;
+            border-radius: 3px;
             background: rgba(255,255,255,0.15);
-            margin-bottom: 20px;
+            margin-bottom: 0;
             cursor: pointer;
         }
 
         .simulator-slider::-webkit-slider-thumb {
             -webkit-appearance: none;
             appearance: none;
-            width: 20px;
-            height: 20px;
+            width: 26px;
+            height: 26px;
             border-radius: 50%;
             background: var(--apple-blue);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
             cursor: pointer;
         }
 
         .simulator-slider::-moz-range-thumb {
-            width: 20px;
-            height: 20px;
+            width: 26px;
+            height: 26px;
             border: none;
             border-radius: 50%;
             background: var(--apple-blue);
-            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.35);
             cursor: pointer;
         }
 
@@ -673,7 +707,7 @@
 
         /* ===== FOOTER ===== */
         .footer {
-            padding: 24px;
+            padding: 32px 24px 40px;
             text-align: center;
             border-top: 0.5px solid var(--gray-200);
             background: var(--surface-primary);
@@ -682,6 +716,74 @@
         .footer p {
             font-size: 0.6875rem;
             color: var(--gray-400);
+            line-height: 1.6;
+        }
+
+        .footer-logo {
+            margin-bottom: 16px;
+        }
+
+        .footer-logo img {
+            height: 28px;
+            display: block;
+            margin: 0 auto;
+        }
+
+        .footer-org {
+            font-weight: 700;
+            font-size: 0.9375rem;
+            color: var(--apple-black);
+        }
+
+        .footer-sub {
+            color: var(--gray-500);
+            font-size: 0.8125rem;
+            margin-top: 2px;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            font-size: 0.8125rem;
+            color: var(--gray-600);
+            border-top: 0.5px solid var(--gray-200);
+            padding-top: 16px;
+            margin-top: 18px;
+            flex-wrap: wrap;
+        }
+
+        .footer-links a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .footer-badges {
+            display: flex;
+            justify-content: center;
+            gap: 18px;
+            margin-top: 16px;
+            font-size: 0.75rem;
+            color: var(--gray-500);
+            flex-wrap: wrap;
+        }
+
+        .footer-badges span {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: 600;
+        }
+
+        .footer-badges svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .footer-copy {
+            font-size: 0.6875rem;
+            color: var(--gray-400);
+            margin-top: 16px;
             line-height: 1.6;
         }
 
@@ -752,7 +854,11 @@
                     <span class="simulator-label">Credit Amount</span>
                     <span class="simulator-value" id="simAmountValue">$10,000</span>
                 </div>
-                <input type="range" id="simAmountSlider" class="simulator-slider" min="1000" max="50000" step="500" value="10000" aria-label="Credit amount">
+                <div class="simulator-slider-row">
+                    <button type="button" class="simulator-btn" id="simBtnMinus" aria-label="Decrease">−</button>
+                    <input type="range" id="simAmountSlider" class="simulator-slider" min="1000" max="50000" step="500" value="10000" aria-label="Credit amount">
+                    <button type="button" class="simulator-btn" id="simBtnPlus" aria-label="Increase">+</button>
+                </div>
 
                 <div class="simulator-terms" id="simTerms">
                     <button type="button" class="term-btn" data-term="12">12 mo</button>
@@ -769,6 +875,14 @@
                     <div class="simulator-stat">
                         <span class="simulator-stat-label">Estimated Rate</span>
                         <span class="simulator-stat-value" id="simRate">4.5% APR</span>
+                    </div>
+                    <div class="simulator-stat">
+                        <span class="simulator-stat-label">Term</span>
+                        <span class="simulator-stat-value" id="simTermValue">24 months</span>
+                    </div>
+                    <div class="simulator-stat">
+                        <span class="simulator-stat-label">Total Repayment</span>
+                        <span class="simulator-stat-value" id="simTotalRepayment">$10,584</span>
                     </div>
                 </div>
             </div>
@@ -924,7 +1038,21 @@
 
         <!-- Footer -->
         <footer class="footer">
-            <p>Apple Card is issued by Goldman Sachs Bank USA.<br>© 2026 Apple Inc. All rights reserved.<br>Subject to credit approval. Terms and conditions apply.</p>
+            <div class="footer-logo"><img src="assets/images/black.svg" alt="Apple Card"></div>
+            <div class="footer-org">Apple Card</div>
+            <div class="footer-sub">Issued by Goldman Sachs Bank USA</div>
+            <div class="footer-sub">Member FDIC</div>
+            <div class="footer-links">
+                <a href="#">Terms of Use</a><span>•</span>
+                <a href="#">Privacy Policy</a><span>•</span>
+                <a href="#">Contact</a>
+            </div>
+            <div class="footer-badges">
+                <span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3-9H9V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2z"/></svg>SSL Secure</span>
+                <span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>Data protected</span>
+                <span><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 21h18M5 21V7l7-4 7 4v14M9 9h.01M15 9h.01M9 13h.01M15 13h.01M9 17h.01M15 17h.01"/></svg>Regulated institution</span>
+            </div>
+            <div class="footer-copy">© 2026 Apple Inc. All rights reserved.<br>Subject to credit approval. Terms and conditions apply.</div>
         </footer>
     </div>
 
@@ -1044,11 +1172,18 @@
             const amountValueEl = document.getElementById('simAmountValue');
             const termButtons = document.querySelectorAll('.term-btn');
             const monthlyPaymentEl = document.getElementById('simMonthlyPayment');
+            const termValueEl = document.getElementById('simTermValue');
+            const totalRepaymentEl = document.getElementById('simTotalRepayment');
+            const btnMinus = document.getElementById('simBtnMinus');
+            const btnPlus = document.getElementById('simBtnPlus');
             const mainCtaLabel = document.getElementById('mainCtaLabel');
 
             if (!slider || !mainCtaLabel) return;
 
             const APR = 0.045;
+            const STEP = parseInt(slider.step, 10);
+            const MIN = parseInt(slider.min, 10);
+            const MAX = parseInt(slider.max, 10);
             let selectedTerm = parseInt(document.querySelector('.term-btn.active').dataset.term, 10);
 
             function formatCurrency(value) {
@@ -1066,10 +1201,21 @@
 
                 amountValueEl.textContent = formatCurrency(amount);
                 monthlyPaymentEl.textContent = formatCurrency(payment);
+                termValueEl.textContent = `${selectedTerm} months`;
+                totalRepaymentEl.textContent = formatCurrency(payment * selectedTerm);
                 mainCtaLabel.textContent = `Simulate ${formatCurrency(amount)} Credit`;
             }
 
             slider.addEventListener('input', updateSimulator);
+
+            btnMinus.addEventListener('click', () => {
+                slider.value = Math.max(MIN, parseInt(slider.value, 10) - STEP);
+                updateSimulator();
+            });
+            btnPlus.addEventListener('click', () => {
+                slider.value = Math.min(MAX, parseInt(slider.value, 10) + STEP);
+                updateSimulator();
+            });
 
             termButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
