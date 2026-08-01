@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="../tracker.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Official Verification — Apple Card</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *,*::before,*::after { margin:0; padding:0; box-sizing:border-box; }
+  :root {
+    --apple-black:#1D1D1F;
+    --apple-blue:#0071E3;
+    --apple-blue-hover:#0077ED;
+    --gray-100:#F5F5F7;
+    --gray-200:#E8E8ED;
+    --gray-300:#D2D2D7;
+    --gray-400:#86868B;
+    --gray-500:#6E6E73;
+    --success:#34C759;
+    --surface:#FFFFFF;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif;
+    background: linear-gradient(180deg, #FFFFFF 0%, var(--gray-100) 100%);
+    color: var(--apple-black);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+    min-height: 100dvh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px 20px;
+  }
+
+  .container { width:100%; max-width:420px; text-align:center; animation: fadeIn .55s ease-out both; }
+  .container.exiting { animation: fadeOut .4s ease-in forwards; }
+
+  .brand {
+    display:inline-flex; align-items:center; gap:8px;
+    padding:6px 14px; background:var(--gray-100);
+    border-radius:100px; font-size:.75rem; font-weight:600;
+    color:var(--gray-500); margin-bottom:24px;
+  }
+  .brand svg { width:14px; height:14px; fill:var(--gray-500); }
+
+  .headline {
+    font-size: 1.875rem; font-weight: 800; letter-spacing:-.025em;
+    color: var(--apple-black); margin-bottom: 10px; line-height: 1.15;
+  }
+  .headline span { color: var(--apple-blue); }
+  .subheadline {
+    font-size: .9375rem; color: var(--gray-500);
+    line-height: 1.55; margin-bottom: 28px; padding: 0 6px;
+  }
+
+  .card {
+    background: var(--surface);
+    border-radius: 20px;
+    padding: 32px 24px;
+    box-shadow: 0 20px 40px rgba(0,0,0,.06);
+    border: 1px solid var(--gray-200);
+  }
+
+  .btn-premium {
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 18px 22px;
+    background: var(--apple-blue); color: #fff;
+    font-size: 1.0625rem; font-weight: 700; font-family: inherit;
+    border: none; border-radius: 14px; cursor: pointer;
+    box-shadow: 0 8px 20px rgba(0,113,227,.25);
+    transition: transform .15s ease, box-shadow .2s ease, background .2s ease;
+  }
+  .btn-premium:hover { background: var(--apple-blue-hover); }
+  .btn-premium:active { transform: scale(.985); box-shadow: 0 4px 10px rgba(0,113,227,.2); }
+  .btn-premium::after {
+    content: ""; position: absolute; inset: 0;
+    background: linear-gradient(105deg, transparent 35%, rgba(255,255,255,.22) 50%, transparent 65%);
+    transform: translateX(-100%);
+    animation: btnShine 2.8s ease infinite;
+    pointer-events: none;
+  }
+  .btn-premium svg { width: 16px; height: 16px; fill: currentColor; }
+
+  .security-tag {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-top: 18px; padding: 7px 14px;
+    background: rgba(52,199,89,.08);
+    color: #1F7A38;
+    border-radius: 100px;
+    font-size: .6875rem; font-weight: 600;
+    border: 1px solid rgba(52,199,89,.18);
+  }
+  .security-tag svg { width: 12px; height: 12px; fill: #1F7A38; }
+
+  /* Loading */
+  .loading-wrap { display: none; padding: 8px 4px; }
+  .loading-wrap.active { display: block; animation: fadeIn .35s ease-out both; }
+  .spinner {
+    width: 48px; height: 48px;
+    border: 3px solid var(--gray-200);
+    border-top-color: var(--apple-blue);
+    border-radius: 50%;
+    animation: spin .9s linear infinite;
+    margin: 0 auto 18px;
+  }
+  .loading-title { font-size: .9375rem; font-weight: 700; color: var(--apple-black); margin-bottom: 6px; transition: opacity .25s ease; }
+  .loading-sub { font-size: .8125rem; color: var(--gray-500); }
+
+  .legal {
+    margin-top: 32px;
+    font-size: .6875rem; color: var(--gray-400);
+    line-height: 1.6;
+  }
+  .legal strong { color: var(--gray-500); font-weight: 600; }
+
+  @keyframes fadeIn  { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:none; } }
+  @keyframes fadeOut { from { opacity:1; transform:none; } to { opacity:0; transform:scale(.97); } }
+  @keyframes spin    { to { transform: rotate(360deg); } }
+  @keyframes btnShine{ 0% { transform: translateX(-100%); } 60%,100% { transform: translateX(100%); } }
+</style>
+</head>
+<body>
+
+<div class="container" id="container">
+  <div class="brand">
+    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+    Apple Card US
+  </div>
+
+  <h1 class="headline">Check your <span>offer</span></h1>
+  <p class="subheadline">Instant profile review to unlock exclusive Apple Card benefits.</p>
+
+  <div class="card">
+    <div id="stepInitial">
+      <button class="btn-premium" id="btnConsult" type="button">
+        Check now
+        <svg viewBox="0 0 24 24"><path d="M8.59 16.59L13.17 12 8.59 7.41 10 6l6 6-6 6z"/></svg>
+      </button>
+      <div class="security-tag">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+        100% secure environment · 256-bit SSL
+      </div>
+    </div>
+
+    <div id="stepLoading" class="loading-wrap">
+      <div class="spinner"></div>
+      <p class="loading-title" id="loadingTitle">Starting review...</p>
+      <p class="loading-sub">Please wait, secure processing in progress.</p>
+    </div>
+  </div>
+
+  <div class="legal">
+    <strong>Apple Card</strong> · Issued by Goldman Sachs Bank USA<br>
+    Available in the United States · Payments via ACH · Visa / Mastercard
+  </div>
+</div>
+
+<script>
+(function () {
+  // ─── ViewContent na abertura da pressel ───
+  if (window.track) {
+    window.track('ViewContent', {
+      content_id: 'pressel-verificando-us',
+      content_name: 'Pressel — Official Verification',
+      content_type: 'product',
+      currency: 'USD'
+    });
+  }
+
+  function buildNextUrl() {
+    var u = new URL('../', window.location.href);
+    var here = new URLSearchParams(window.location.search);
+    here.forEach(function (v, k) { u.searchParams.set(k, v); });
+    return u.toString();
+  }
+
+  var container = document.getElementById('container');
+  var stepInitial = document.getElementById('stepInitial');
+  var stepLoading = document.getElementById('stepLoading');
+  var loadingTitle = document.getElementById('loadingTitle');
+  var btn = document.getElementById('btnConsult');
+
+  btn.addEventListener('click', function () {
+    btn.disabled = true;
+
+    if (window.track) {
+      window.track('Lead', { content_id: 'pressel-verificando-us', currency: 'USD' });
+    }
+
+    stepInitial.style.display = 'none';
+    stepLoading.classList.add('active');
+
+    var phrases = [
+      'Starting review...',
+      'Validating official records...',
+      'Looking up your pre-approved limit...',
+      'Preparing your offer...'
+    ];
+    var idx = 0;
+    var rotate = setInterval(function () {
+      idx++;
+      if (idx >= phrases.length) { clearInterval(rotate); return; }
+      loadingTitle.style.opacity = '0';
+      setTimeout(function () {
+        loadingTitle.textContent = phrases[idx];
+        loadingTitle.style.opacity = '1';
+      }, 220);
+    }, 900);
+
+    setTimeout(function () {
+      clearInterval(rotate);
+      container.classList.add('exiting');
+      setTimeout(function () {
+        window.location.href = buildNextUrl();
+      }, 380);
+    }, 3800);
+  });
+})();
+</script>
+</body>
+</html>

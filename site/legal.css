@@ -1,0 +1,25 @@
+/* Estilo partilhado das páginas legais (Privacidade, Termos, Cookies). */
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--apple-black:#1D1D1F;--apple-blue:#0071E3;--gray-100:#F5F5F7;--gray-200:#E8E8ED;--gray-300:#D2D2D7;--gray-400:#86868B;--gray-500:#6E6E73;--gray-600:#424245;--surface:#FFFFFF}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--gray-100);color:var(--apple-black);-webkit-font-smoothing:antialiased;min-height:100vh}
+.page{max-width:720px;margin:0 auto;min-height:100vh;background:var(--surface)}
+.nav{display:flex;align-items:center;padding:14px 20px;border-bottom:0.5px solid var(--gray-200);position:sticky;top:0;background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);z-index:10}
+.nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:var(--gray-100);border-radius:50%;cursor:pointer}
+.nav-back svg{width:14px;height:14px;fill:var(--apple-black)}
+.nav-title{flex:1;text-align:center;font-size:0.9375rem;font-weight:700}
+.nav-spacer{width:32px}
+.content{padding:32px 24px 60px;max-width:680px;margin:0 auto}
+.legal-meta{font-size:0.75rem;color:var(--gray-400);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.06em}
+.legal-title{font-size:1.875rem;font-weight:800;letter-spacing:-0.02em;margin-bottom:8px;line-height:1.15}
+.legal-lead{font-size:0.9375rem;color:var(--gray-500);line-height:1.6;margin-bottom:32px}
+.legal-section{margin-bottom:28px}
+.legal-section h2{font-size:1.125rem;font-weight:700;margin-bottom:10px;color:var(--apple-black)}
+.legal-section h3{font-size:1rem;font-weight:600;margin:16px 0 6px;color:var(--apple-black)}
+.legal-section p{font-size:0.9375rem;color:var(--gray-600);line-height:1.6;margin-bottom:10px}
+.legal-section ul{margin:8px 0 12px 18px}
+.legal-section li{font-size:0.9375rem;color:var(--gray-600);line-height:1.55;margin-bottom:4px}
+.legal-section a{color:var(--apple-blue);text-decoration:none}
+.legal-section a:hover{text-decoration:underline}
+.legal-section strong{color:var(--apple-black);font-weight:600}
+.legal-footer{margin-top:48px;padding-top:24px;border-top:1px solid var(--gray-200);font-size:0.75rem;color:var(--gray-400);line-height:1.5}
+.legal-footer a{color:var(--gray-500)}

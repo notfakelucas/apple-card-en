@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Financial Profile — Apple Card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --apple-black: #1D1D1F; --apple-blue: #0071E3; --apple-blue-hover: #0077ED;
+            --gray-100: #F5F5F7; --gray-200: #E8E8ED; --gray-300: #D2D2D7;
+            --gray-400: #86868B; --gray-500: #6E6E73; --gray-600: #424245;
+            --success: #34C759; --error: #FF3B30; --warning: #FF9F0A;
+            --surface-primary: #FFFFFF;
+        }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Inter', sans-serif; background: var(--gray-100); color: var(--apple-black); -webkit-font-smoothing: antialiased; }
+        .page-wrapper { max-width: 520px; margin: 0 auto; min-height: 100vh; background: var(--surface-primary); display: flex; flex-direction: column; }
+
+        .nav { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; background: rgba(255,255,255,0.72); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border-bottom: 0.5px solid var(--gray-200); position: sticky; top: 0; z-index: 100; }
+        .nav-logo { display: flex; align-items: center; gap: 8px; }
+        .nav-logo img { width: 28px; height: 34px; }
+        .nav-logo span { font-size: 1.125rem; font-weight: 600; letter-spacing: -0.02em; }
+        .nav-user { font-size: 0.75rem; color: var(--gray-500); display: flex; align-items: center; gap: 6px; }
+        .nav-user svg { width: 14px; height: 14px; fill: var(--gray-400); }
+
+        /* Progress */
+        .progress-wrapper { padding: 20px 24px 0; }
+        .progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .progress-step-text { font-size: 0.8125rem; font-weight: 500; color: var(--gray-500); }
+        .progress-track { height: 4px; background: var(--gray-200); border-radius: 2px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--apple-blue); border-radius: 2px; transition: width 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+
+        /* Content */
+        .content { flex: 1; padding: 32px 24px; }
+        .question-container { animation: fadeInUp 0.4s ease-out; }
+        .question-container.exit { animation: fadeOutLeft 0.3s ease-in forwards; }
+
+        .question-title { font-size: 1.375rem; font-weight: 700; letter-spacing: -0.02em; margin-bottom: 6px; }
+        .question-subtitle { font-size: 0.875rem; color: var(--gray-500); margin-bottom: 24px; line-height: 1.5; }
+
+        /* Option Cards */
+        .options-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .options-grid.single-col { grid-template-columns: 1fr; }
+
+        .option-card {
+            display: flex; align-items: center; gap: 12px;
+            padding: 16px; background: var(--surface-primary);
+            border: 1.5px solid var(--gray-200); border-radius: 14px;
+            cursor: pointer; transition: all 0.25s ease;
+            position: relative; overflow: hidden;
+        }
+        .option-card:hover { border-color: rgba(0,113,227,0.4); background: rgba(0,113,227,0.02); }
+        .option-card:active { transform: scale(0.98); }
+        .option-card.selected { border-color: var(--apple-blue); background: rgba(0,113,227,0.06); }
+        .option-card.selected::after {
+            content: ''; position: absolute; top: 8px; right: 8px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--apple-blue);
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3E%3Cpath d='M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z'/%3E%3C/svg%3E");
+            background-size: 12px; background-position: center; background-repeat: no-repeat;
+        }
+
+        .option-icon {
+            width: 40px; height: 40px; border-radius: 10px;
+            display: flex; align-items: center; justify-content: center;
+            flex-shrink: 0;
+        }
+        .option-icon svg { width: 20px; height: 20px; }
+
+        .option-icon.blue { background: rgba(0,113,227,0.1); }
+        .option-icon.blue svg { fill: var(--apple-blue); }
+        .option-icon.green { background: rgba(52,199,89,0.1); }
+        .option-icon.green svg { fill: var(--success); }
+        .option-icon.purple { background: rgba(175,82,222,0.1); }
+        .option-icon.purple svg { fill: #AF52DE; }
+        .option-icon.orange { background: rgba(255,159,10,0.1); }
+        .option-icon.orange svg { fill: var(--warning); }
+        .option-icon.red { background: rgba(255,59,48,0.1); }
+        .option-icon.red svg { fill: var(--error); }
+        .option-icon.teal { background: rgba(90,200,250,0.1); }
+        .option-icon.teal svg { fill: #5AC8FA; }
+
+        .option-text { font-size: 0.875rem; font-weight: 500; color: var(--apple-black); line-height: 1.3; }
+
+        /* Two-col special: for yes/no */
+        .options-two {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
+        }
+        .option-big {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 8px; padding: 24px 16px;
+            background: var(--surface-primary); border: 1.5px solid var(--gray-200);
+            border-radius: 14px; cursor: pointer; transition: all 0.25s ease;
+            text-align: center;
+        }
+        .option-big:hover { border-color: rgba(0,113,227,0.4); }
+        .option-big:active { transform: scale(0.97); }
+        .option-big.selected { border-color: var(--apple-blue); background: rgba(0,113,227,0.06); }
+        .option-big .big-icon { width: 48px; height: 48px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
+        .option-big .big-icon svg { width: 24px; height: 24px; }
+        .option-big .big-icon.green { background: rgba(52,199,89,0.1); }
+        .option-big .big-icon.green svg { fill: var(--success); }
+        .option-big .big-icon.red { background: rgba(255,59,48,0.1); }
+        .option-big .big-icon.red svg { fill: var(--error); }
+        .option-big span { font-size: 0.9375rem; font-weight: 600; color: var(--apple-black); }
+
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeOutLeft { to { opacity: 0; transform: translateX(-30px); } }
+
+        @media (max-width: 380px) {
+            .question-title { font-size: 1.25rem; }
+            .options-grid { gap: 8px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <nav class="nav">
+            <div class="nav-logo">
+                <img src="assets/images/black.svg" alt="" style="width:28px;height:34px">
+                <span>Card</span>
+            </div>
+            <div class="nav-user" id="navUser">
+                <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                <span id="navUserName"></span>
+            </div>
+        </nav>
+
+        <div class="progress-wrapper">
+            <div class="progress-header">
+                <span class="progress-step-text" id="stepText">Question 1 of 4</span>
+            </div>
+            <div class="progress-track">
+                <div class="progress-fill" id="progressFill" style="width: 25%"></div>
+            </div>
+        </div>
+
+        <div class="content" id="quizContent">
+            <!-- Questions rendered by JS -->
+        </div>
+    </div>
+
+    <script>
+        /* ===== UTM ===== */
+        (function(){ var u=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck']; var p=new URLSearchParams(window.location.search); u.forEach(function(k){ var v=p.get(k); if(v) localStorage.setItem(k,v); }); })();
+
+        /* ===== LEAD DATA ===== */
+        const LeadData = {
+            _key: 'applecard_lead',
+            save(d) { localStorage.setItem(this._key, JSON.stringify(d)); },
+            load() { try { return JSON.parse(localStorage.getItem(this._key) || '{}'); } catch { return {}; } },
+            update(d) { const c = this.load(); const u = { ...c, ...d, updated_at: Date.now() }; if (!u.lead_id) u.lead_id = 'AC'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).substr(2,4).toUpperCase(); this.save(u); return u; }
+        };
+
+        function buildUrl(base, extra={}) {
+            const url = new URL(base, window.location.href);
+            new URLSearchParams(window.location.search).forEach((v,k) => url.searchParams.set(k,v));
+            Object.entries(extra).forEach(([k,v]) => { if(v) url.searchParams.set(k,v); });
+            return url.toString();
+        }
+
+        /* ===== LIMIT CALCULATION ===== */
+        function calculateLimit(rendaKey, negativado) {
+            const ranges = {
+                'ate-2k':   { min: 3500, max: 5000 },
+                '2k-5k':    { min: 5000, max: 8500 },
+                '5k-10k':   { min: 8500, max: 12500 },
+                '10k-20k':  { min: 12500, max: 18000 },
+                '20k-plus': { min: 18000, max: 25000 }
+            };
+
+            if (negativado) {
+                return randomRound(2500, 3500, 50);
+            }
+
+            const range = ranges[rendaKey] || { min: 2500, max: 3500 };
+            return randomRound(range.min, range.max, 50);
+        }
+
+        function randomRound(min, max, step) {
+            const val = Math.floor(Math.random() * (max - min + 1)) + min;
+            return Math.round(val / step) * step;
+        }
+
+        /* ===== QUESTIONS DATA ===== */
+        const questions = [
+            {
+                id: 'objetivo',
+                title: 'What\'s your goal with Apple Card?',
+                subtitle: 'Select the option that best matches your interest.',
+                type: 'grid',
+                options: [
+                    { value: 'compras-online', label: 'Online Shopping', icon: 'cart', color: 'blue' },
+                    { value: 'viagens', label: 'Travel', icon: 'plane', color: 'purple' },
+                    { value: 'dia-a-dia', label: 'Everyday Use', icon: 'coffee', color: 'orange' },
+                    { value: 'apple-products', label: 'Apple Products', icon: 'apple', color: 'teal' },
+                    { value: 'investir', label: 'Invest in Myself', icon: 'star', color: 'green' },
+                    { value: 'outros', label: 'Other', icon: 'dots', color: 'red' }
+                ]
+            },
+            {
+                id: 'profissao',
+                title: 'What\'s your current occupation?',
+                subtitle: 'This helps us personalize your offer.',
+                type: 'list',
+                options: [
+                    { value: 'clt', label: 'Employee (W-2)', icon: 'briefcase', color: 'blue' },
+                    { value: 'autonomo', label: 'Self-employed (1099)', icon: 'hammer', color: 'orange' },
+                    { value: 'servidor', label: 'Government Employee', icon: 'building', color: 'green' },
+                    { value: 'empresario', label: 'Business Owner', icon: 'chart', color: 'purple' },
+                    { value: 'aposentado', label: 'Retired', icon: 'heart', color: 'teal' },
+                    { value: 'estudante', label: 'Student', icon: 'book', color: 'red' }
+                ]
+            },
+            {
+                id: 'renda',
+                title: 'What\'s your monthly income range?',
+                subtitle: 'We use this to calculate your credit limit.',
+                type: 'list',
+                options: [
+                    { value: 'ate-2k', label: 'Up to $2,000', icon: 'money1', color: 'green' },
+                    { value: '2k-5k', label: '$2,000 — $5,000', icon: 'money2', color: 'blue' },
+                    { value: '5k-10k', label: '$5,000 — $10,000', icon: 'money3', color: 'purple' },
+                    { value: '10k-20k', label: '$10,000 — $20,000', icon: 'money4', color: 'orange' },
+                    { value: '20k-plus', label: 'Above $20,000', icon: 'money5', color: 'teal' }
+                ]
+            },
+            {
+                id: 'restricao',
+                title: 'Do you have any credit restrictions?',
+                subtitle: 'Don\'t worry, this won\'t prevent approval.',
+                type: 'yesno',
+                options: [
+                    { value: 'sim', label: 'Yes, I do' },
+                    { value: 'nao', label: 'No, I don\'t' }
+                ]
+            }
+        ];
+
+        /* ===== ICONS ===== */
+        const icons = {
+            cart: '<path d="M7 18c-1.1 0-1.99.9-1.99 2S5.9 22 7 22s2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96 0 1.1.9 2 2 2h12v-2H7.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63h7.45c.75 0 1.41-.41 1.75-1.03l3.58-6.49c.08-.14.12-.31.12-.48 0-.55-.45-1-1-1H5.21l-.94-2H1zm16 16c-1.1 0-1.99.9-1.99 2s.89 2 1.99 2 2-.9 2-2-.9-2-2-2z"/>',
+            plane: '<path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/>',
+            coffee: '<path d="M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM2 21h18v-2H2v2z"/>',
+            apple: '<path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>',
+            star: '<path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/>',
+            dots: '<circle cx="12" cy="12" r="2"/><circle cx="12" cy="5" r="2"/><circle cx="12" cy="19" r="2"/>',
+            briefcase: '<path d="M20 6h-4V4c0-1.11-.89-2-2-2h-4c-1.11 0-2 .89-2 2v2H4c-1.11 0-1.99.89-1.99 2L2 19c0 1.11.89 2 2 2h16c1.11 0 2-.89 2-2V8c0-1.11-.89-2-2-2zm-6 0h-4V4h4v2z"/>',
+            hammer: '<path d="M2 21h18v-2H2v2zm0-8h8v6h10v-6h2V9L12 3 2 9v4zm10-6.39L17.39 9H6.61L12 6.61z"/>',
+            building: '<path d="M12 7V3H2v18h20V7H12zM6 19H4v-2h2v2zm0-4H4v-2h2v2zm0-4H4V9h2v2zm0-4H4V5h2v2zm4 12H8v-2h2v2zm0-4H8v-2h2v2zm0-4H8V9h2v2zm0-4H8V5h2v2zm10 12h-8v-2h2v-2h-2v-2h2v-2h-2V9h8v10zm-2-8h-2v2h2v-2zm0 4h-2v2h2v-2z"/>',
+            chart: '<path d="M3.5 18.49l6-6.01 4 4L22 6.92l-1.41-1.41-7.09 7.97-4-4L2 16.99z"/>',
+            heart: '<path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>',
+            book: '<path d="M18 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 4h5v8l-2.5-1.5L6 12V4z"/>',
+            money1: '<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>',
+            money2: '<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>',
+            money3: '<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>',
+            money4: '<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>',
+            money5: '<path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/>'
+        };
+
+        /* ===== STATE ===== */
+        let currentQ = 0;
+        const answers = {};
+        const leadData = LeadData.load();
+        const userName = leadData.nome || new URLSearchParams(window.location.search).get('nome') || '';
+
+        // Show user name in nav
+        if (userName) {
+            const firstName = userName.split(' ')[0];
+            document.getElementById('navUserName').textContent = firstName;
+        }
+
+        /* ===== RENDER QUESTION ===== */
+        function renderQuestion(idx) {
+            const q = questions[idx];
+            const container = document.getElementById('quizContent');
+            const progress = ((idx + 1) / questions.length) * 100;
+            document.getElementById('progressFill').style.width = progress + '%';
+            document.getElementById('stepText').textContent = `Question ${idx + 1} of ${questions.length}`;
+
+            let optionsHTML = '';
+
+            if (q.type === 'grid' || q.type === 'list') {
+                const gridClass = q.type === 'grid' ? 'options-grid' : 'options-grid single-col';
+                optionsHTML = `<div class="${gridClass}">`;
+                q.options.forEach(opt => {
+                    optionsHTML += `
+                        <div class="option-card" data-value="${opt.value}" onclick="selectOption(this, '${q.id}', '${opt.value}')">
+                            <div class="option-icon ${opt.color}">
+                                <svg viewBox="0 0 24 24">${icons[opt.icon]}</svg>
+                            </div>
+                            <span class="option-text">${opt.label}</span>
+                        </div>`;
+                });
+                optionsHTML += '</div>';
+            } else if (q.type === 'yesno') {
+                optionsHTML = `
+                    <div class="options-two">
+                        <div class="option-big" onclick="selectOption(this, '${q.id}', 'sim')">
+                            <div class="big-icon red">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            </div>
+                            <span>Yes, I do</span>
+                        </div>
+                        <div class="option-big" onclick="selectOption(this, '${q.id}', 'nao')">
+                            <div class="big-icon green">
+                                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                            </div>
+                            <span>No, I don't</span>
+                        </div>
+                    </div>`;
+            }
+
+            container.innerHTML = `
+                <div class="question-container" id="qContainer">
+                    <h1 class="question-title">${q.title}</h1>
+                    <p class="question-subtitle">${q.subtitle}</p>
+                    ${optionsHTML}
+                </div>`;
+        }
+
+        /* ===== SELECT OPTION ===== */
+        function selectOption(el, qId, value) {
+            // Visual feedback
+            el.classList.add('selected');
+            answers[qId] = value;
+
+            // Save to LeadData
+            LeadData.update({ [`quiz_${qId}`]: value });
+
+            // Advance after brief delay
+            setTimeout(() => {
+                if (currentQ < questions.length - 1) {
+                    const container = document.getElementById('qContainer');
+                    container.classList.add('exit');
+                    setTimeout(() => {
+                        currentQ++;
+                        renderQuestion(currentQ);
+                    }, 300);
+                } else {
+                    finishQuiz();
+                }
+            }, 400);
+        }
+
+        /* ===== FINISH QUIZ ===== */
+        function finishQuiz() {
+            const rendaKey = answers.renda || 'ate-2k';
+            const negativado = answers.restricao === 'sim';
+            const limite = calculateLimit(rendaKey, negativado);
+
+            LeadData.update({
+                quiz_completed: true,
+                limite_aprovado: limite,
+                negativado: negativado,
+                page: 'quiz'
+            });
+
+            if (window.track) window.track('CompleteRegistration', { value: limite, currency: 'USD', content_id: 'apple-card-us' });
+
+            window.location.href = buildUrl('analise.html');
+        }
+
+        // Init
+        renderQuestion(0);
+    </script>
+</body>
+</html>

