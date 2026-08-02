@@ -192,25 +192,25 @@
         LeadData.update({ page: 'aprovado' });
         const data = LeadData.load();
         const params = new URLSearchParams(window.location.search);
-        const userName = data.nome || params.get('nome') || 'Guest';
+        const userName = data.name || params.get('name') || 'Guest';
         const firstName = userName.split(' ')[0];
-        const limite = data.limite_aprovado || parseInt(params.get('limite')) || 5000;
+        const limit = data.approved_limit || parseInt(params.get('limit')) || 5000;
 
-        if (window.track) window.track('Subscribe', { value: limite, currency: 'EUR', content_id: 'apple-card-eu' });
-        const corCartao = data.card_color || 'silver';
+        if (window.track) window.track('Subscribe', { value: limit, currency: 'EUR', content_id: 'apple-card-eu' });
+        const cardColor = data.card_color || 'silver';
 
         const colorMap = {
             silver: { label:'Titanium', gradient:'linear-gradient(145deg, #E3E3E8, #C8C8CD, #E8E8ED)' },
             black: { label:'Midnight', gradient:'linear-gradient(145deg, #2C2C2E, #1A1A1C, #3A3A3C)' },
             gold: { label:'Starlight', gradient:'linear-gradient(145deg, #F5E6CC, #D4C4A0, #F0DCC0)' }
         };
-        const cc = colorMap[corCartao] || colorMap.silver;
+        const cc = colorMap[cardColor] || colorMap.silver;
 
         document.getElementById('nameDisplay').textContent = firstName;
         document.getElementById('cardName').textContent = userName.toUpperCase();
         document.getElementById('cardBg').style.background = cc.gradient;
         document.getElementById('cardType').textContent = `Apple Card • ${cc.label}`;
-        document.getElementById('limiteDisplay').textContent = limite.toLocaleString('de-DE');
+        document.getElementById('limiteDisplay').textContent = limit.toLocaleString('de-DE');
 
         // CTA
         document.getElementById('ctaBtn').onclick = function(e){

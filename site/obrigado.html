@@ -108,19 +108,19 @@
 
         const data = LeadData.load();
         const params = new URLSearchParams(window.location.search);
-        const tipoLabels = { economico:'Standard', expresso:'Express', premium:'Premium' };
+        const shippingLabels = { standard:'Standard', express:'Express', premium:'Premium' };
 
-        const frete = data.frete_valor || parseFloat(params.get('frete')) || 22.45;
-        const tipo = data.frete_tipo || params.get('tipo') || 'expresso';
-        const corLabel = data.card_color_label || 'Titanium';
+        const shipping = data.shipping_price || parseFloat(params.get('shipping')) || 22.45;
+        const type = data.shipping_type || params.get('type') || 'express';
+        const cardColorLabel = data.card_color_label || 'Titanium';
         const txId = data.transaction_id || '—';
 
-        document.getElementById('cardColor').textContent = corLabel;
-        document.getElementById('shippingType').textContent = tipoLabels[tipo] || 'Express';
-        document.getElementById('totalPaid').textContent = `$${frete.toFixed(2)}`;
+        document.getElementById('cardColor').textContent = cardColorLabel;
+        document.getElementById('shippingType').textContent = shippingLabels[type] || 'Express';
+        document.getElementById('totalPaid').textContent = `€ ${shipping.toFixed(2)}`;
         document.getElementById('orderId').textContent = txId;
 
-        // With Cooud, payment method is determined on the hosted page (card / PIX / etc.).
+        // Payment method is determined on the hosted page (card / bank transfer / etc.).
         // We only know "paid"; label generically unless server told us a specific method.
         const payMethod = (data.payment_method || 'cooud').toString();
         const methodLabel = payMethod === 'bank_transfer' ? 'Bank transfer ✓' : 'Card ✓';
@@ -132,11 +132,11 @@
         try {
             if (window.ttq && txId && txId !== '—') {
                 window.ttq.track('Purchase', {
-                    value: frete,
+                    value: shipping,
                     currency: 'EUR',
                     content_type: 'product',
-                    content_id: 'apple-card-eu-' + tipo,
-                    content_name: 'Apple Card — ' + (tipoLabels[tipo] || 'Express'),
+                    content_id: 'apple-card-eu-' + type,
+                    content_name: 'Apple Card — ' + (shippingLabels[type] || 'Express'),
                     transaction_id: txId,
                     event_id: 'purchase_' + txId
                 }, { event_id: 'purchase_' + txId });

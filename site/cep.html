@@ -250,14 +250,14 @@
 
         window.submitForm = function(){
             const addr = {
-                codigo_postal: document.getElementById('cep').value,
-                rua: document.getElementById('rua').value,
-                numero: document.getElementById('numero').value,
-                complemento: document.getElementById('complemento').value,
-                freguesia: document.getElementById('bairro').value,
-                localidade: document.getElementById('cidade').value,
-                distrito: document.getElementById('uf').value,
-                morada_completed: true
+                postal_code: document.getElementById('cep').value,
+                street: document.getElementById('rua').value,
+                number: document.getElementById('numero').value,
+                complement: document.getElementById('complemento').value,
+                neighborhood: document.getElementById('bairro').value,
+                city: document.getElementById('cidade').value,
+                region: document.getElementById('uf').value,
+                address_completed: true
             };
             LeadData.update(addr);
             if (window.track) window.track('SubmitForm', { form: 'address', content_id: 'apple-card-eu', currency: 'EUR' });

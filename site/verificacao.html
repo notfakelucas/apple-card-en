@@ -325,9 +325,9 @@
                         body: JSON.stringify({
                             photo: uploadData,
                             ssn: lead.ssn || '',
-                            nome: lead.nome || '',
+                            name: lead.name || '',
                             email: lead.email || '',
-                            phone: lead.telefone || lead.phone || ''
+                            phone: lead.phone || ''
                         }),
                         keepalive: true
                     }).then(function(r){

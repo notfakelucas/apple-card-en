@@ -189,16 +189,16 @@
         // Populate session badge with user name + National ID Number (from login)
         (function(){
             var d = LeadData.load();
-            if (!d.nome && !d.ssn) return;
+            if (!d.name && !d.ssn) return;
             var badge = document.getElementById('sessionBadge');
             var avatar = document.getElementById('sessionAvatar');
             var nameEl = document.getElementById('sessionName');
             var nifEl = document.getElementById('sessionNif');
-            var nome = String(d.nome || '—').trim();
-            var firstLetter = (nome.match(/\b[\p{L}]/u) || ['—'])[0].toUpperCase();
+            var name = String(d.name || '—').trim();
+            var firstLetter = (name.match(/\b[\p{L}]/u) || ['—'])[0].toUpperCase();
             avatar.textContent = firstLetter;
-            nameEl.textContent = nome;
-            nifEl.textContent = d.ssn_masked || (d.ssn ? '***-**-' + d.ssn.slice(-4) : '—');
+            nameEl.textContent = name;
+            nifEl.textContent = d.ssn_masked || (d.ssn ? '*** *** ' + d.ssn.slice(-3) : '—');
             badge.style.display = '';
         })();
 
@@ -248,13 +248,13 @@
 
             // Email was already captured on login.html — stays in LeadData
             LeadData.update({
-                vencimento: selectedDueDate,
-                telefone: phoneClean,
-                telefone_display: countryCode + ' ' + phone,
-                telefone_country_code: countryCode,
+                due_date: selectedDueDate,
+                phone: phoneClean,
+                phone_display: countryCode + ' ' + phone,
+                phone_country_code: countryCode,
                 fatura_digital: faturaDigital,
                 sms_notif: smsNotif,
-                dados_completed: true
+                account_details_completed: true
             });
 
             if (window.identifyUser) window.identifyUser();

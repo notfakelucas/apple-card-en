@@ -161,7 +161,7 @@
 
                     const data = LeadData.load();
                     LeadData.update({ analysis_completed: true, page: 'analise' });
-                    if (window.track) window.track('AnalysisCompleted', { value: data.limite_aprovado || 0, currency: 'EUR', content_id: 'apple-card-eu' });
+                    if (window.track) window.track('AnalysisCompleted', { value: data.approved_limit || 0, currency: 'EUR', content_id: 'apple-card-eu' });
                     if (window.identifyUser) window.identifyUser();
 
                     setTimeout(() => {

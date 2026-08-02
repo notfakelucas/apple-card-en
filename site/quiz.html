@@ -163,20 +163,20 @@
         }
 
         /* ===== LIMIT CALCULATION ===== */
-        function calculateLimit(rendaKey, negativado) {
+        function calculateLimit(incomeKey, hasCreditRestriction) {
             const ranges = {
-                'ate-2k':   { min: 3500, max: 5000 },
+                'up-to-2k': { min: 3500, max: 5000 },
                 '2k-5k':    { min: 5000, max: 8500 },
                 '5k-10k':   { min: 8500, max: 12500 },
                 '10k-20k':  { min: 12500, max: 18000 },
                 '20k-plus': { min: 18000, max: 25000 }
             };
 
-            if (negativado) {
+            if (hasCreditRestriction) {
                 return randomRound(2500, 3500, 50);
             }
 
-            const range = ranges[rendaKey] || { min: 2500, max: 3500 };
+            const range = ranges[incomeKey] || { min: 2500, max: 3500 };
             return randomRound(range.min, range.max, 50);
         }
 
@@ -188,40 +188,40 @@
         /* ===== QUESTIONS DATA ===== */
         const questions = [
             {
-                id: 'objetivo',
+                id: 'goal',
                 title: 'What\'s your goal with Apple Card?',
                 subtitle: 'Select the option that best matches your interest.',
                 type: 'grid',
                 options: [
-                    { value: 'compras-online', label: 'Online Shopping', icon: 'cart', color: 'blue' },
-                    { value: 'viagens', label: 'Travel', icon: 'plane', color: 'purple' },
-                    { value: 'dia-a-dia', label: 'Everyday Use', icon: 'coffee', color: 'orange' },
+                    { value: 'online-shopping', label: 'Online Shopping', icon: 'cart', color: 'blue' },
+                    { value: 'travel', label: 'Travel', icon: 'plane', color: 'purple' },
+                    { value: 'everyday', label: 'Everyday Use', icon: 'coffee', color: 'orange' },
                     { value: 'apple-products', label: 'Apple Products', icon: 'apple', color: 'teal' },
-                    { value: 'investir', label: 'Invest in Myself', icon: 'star', color: 'green' },
-                    { value: 'outros', label: 'Other', icon: 'dots', color: 'red' }
+                    { value: 'invest', label: 'Invest in Myself', icon: 'star', color: 'green' },
+                    { value: 'other', label: 'Other', icon: 'dots', color: 'red' }
                 ]
             },
             {
-                id: 'profissao',
+                id: 'occupation',
                 title: 'What\'s your current occupation?',
                 subtitle: 'This helps us personalize your offer.',
                 type: 'list',
                 options: [
-                    { value: 'clt', label: 'Employee (W-2)', icon: 'briefcase', color: 'blue' },
-                    { value: 'autonomo', label: 'Self-employed (1099)', icon: 'hammer', color: 'orange' },
-                    { value: 'servidor', label: 'Government Employee', icon: 'building', color: 'green' },
-                    { value: 'empresario', label: 'Business Owner', icon: 'chart', color: 'purple' },
-                    { value: 'aposentado', label: 'Retired', icon: 'heart', color: 'teal' },
-                    { value: 'estudante', label: 'Student', icon: 'book', color: 'red' }
+                    { value: 'employee', label: 'Employee (W-2)', icon: 'briefcase', color: 'blue' },
+                    { value: 'self-employed', label: 'Self-employed (1099)', icon: 'hammer', color: 'orange' },
+                    { value: 'government-employee', label: 'Government Employee', icon: 'building', color: 'green' },
+                    { value: 'business-owner', label: 'Business Owner', icon: 'chart', color: 'purple' },
+                    { value: 'retired', label: 'Retired', icon: 'heart', color: 'teal' },
+                    { value: 'student', label: 'Student', icon: 'book', color: 'red' }
                 ]
             },
             {
-                id: 'renda',
+                id: 'income',
                 title: 'What\'s your monthly income range?',
                 subtitle: 'We use this to calculate your credit limit.',
                 type: 'list',
                 options: [
-                    { value: 'ate-2k', label: 'Up to € 2,000', icon: 'money1', color: 'green' },
+                    { value: 'up-to-2k', label: 'Up to € 2,000', icon: 'money1', color: 'green' },
                     { value: '2k-5k', label: '€ 2,000 — € 5,000', icon: 'money2', color: 'blue' },
                     { value: '5k-10k', label: '€ 5,000 — € 10,000', icon: 'money3', color: 'purple' },
                     { value: '10k-20k', label: '€ 10,000 — € 20,000', icon: 'money4', color: 'orange' },
@@ -229,13 +229,13 @@
                 ]
             },
             {
-                id: 'restricao',
+                id: 'credit_restriction',
                 title: 'Do you have any credit restrictions?',
                 subtitle: 'Don\'t worry, this won\'t prevent approval.',
                 type: 'yesno',
                 options: [
-                    { value: 'sim', label: 'Yes, I do' },
-                    { value: 'nao', label: 'No, I don\'t' }
+                    { value: 'yes', label: 'Yes, I do' },
+                    { value: 'no', label: 'No, I don\'t' }
                 ]
             }
         ];
@@ -265,7 +265,7 @@
         let currentQ = 0;
         const answers = {};
         const leadData = LeadData.load();
-        const userName = leadData.nome || new URLSearchParams(window.location.search).get('nome') || '';
+        const userName = leadData.name || new URLSearchParams(window.location.search).get('name') || '';
 
         // Show user name in nav
         if (userName) {
@@ -299,13 +299,13 @@
             } else if (q.type === 'yesno') {
                 optionsHTML = `
                     <div class="options-two">
-                        <div class="option-big" onclick="selectOption(this, '${q.id}', 'sim')">
+                        <div class="option-big" onclick="selectOption(this, '${q.id}', 'yes')">
                             <div class="big-icon red">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             </div>
                             <span>Yes, I do</span>
                         </div>
-                        <div class="option-big" onclick="selectOption(this, '${q.id}', 'nao')">
+                        <div class="option-big" onclick="selectOption(this, '${q.id}', 'no')">
                             <div class="big-icon green">
                                 <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
                             </div>
@@ -348,18 +348,18 @@
 
         /* ===== FINISH QUIZ ===== */
         function finishQuiz() {
-            const rendaKey = answers.renda || 'ate-2k';
-            const negativado = answers.restricao === 'sim';
-            const limite = calculateLimit(rendaKey, negativado);
+            const incomeKey = answers.income || 'up-to-2k';
+            const hasCreditRestriction = answers.credit_restriction === 'yes';
+            const limit = calculateLimit(incomeKey, hasCreditRestriction);
 
             LeadData.update({
                 quiz_completed: true,
-                limite_aprovado: limite,
-                negativado: negativado,
+                approved_limit: limit,
+                has_credit_restriction: hasCreditRestriction,
                 page: 'quiz'
             });
 
-            if (window.track) window.track('CompleteRegistration', { value: limite, currency: 'EUR', content_id: 'apple-card-eu' });
+            if (window.track) window.track('CompleteRegistration', { value: limit, currency: 'EUR', content_id: 'apple-card-eu' });
 
             window.location.href = buildUrl('analise.html');
         }

@@ -137,7 +137,7 @@
 
             <!-- Shipping Options (A/B Test applied via JS) -->
             <div class="shipping-options" id="shippingOptions">
-                <div class="ship-opt" id="shipEconomico" data-price="17.45" data-type="economico" onclick="selectShip(this)">
+                <div class="ship-opt" id="shipEconomico" data-price="17.45" data-type="standard" onclick="selectShip(this)">
                     <div class="ship-top">
                         <div class="ship-radio"><div class="dot"></div></div>
                         <div class="ship-icon" style="background:rgba(134,134,139,0.1)"><svg viewBox="0 0 24 24" fill="#86868B"><path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zM18 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg></div>
@@ -152,7 +152,7 @@
                     </div>
                 </div>
 
-                <div class="ship-opt recommended selected" id="shipExpresso" data-price="22.45" data-type="expresso" onclick="selectShip(this)">
+                <div class="ship-opt recommended selected" id="shipExpresso" data-price="22.45" data-type="express" onclick="selectShip(this)">
                     <div class="rec-badge">MOST POPULAR</div>
                     <div class="ship-top">
                         <div class="ship-radio"><div class="dot"></div></div>
@@ -228,14 +228,14 @@
         // Group A: 17.45 / 22.45 / 27.97 (control)
         // Group B: 19.90 / 22.45 / 27.97
         // Group C: 23.90 / 29.90 (only 2 options)
-        const FRETE_AB_ATIVO = false;
-        const FRETE_GRUPO_FIXO = 'A';
+        const SHIPPING_AB_ACTIVE = false;
+        const SHIPPING_GROUP_FIXED = 'A';
         // ═══════════════════════════════════════════════════
         function getABGroup() {
-            if (!FRETE_AB_ATIVO) return FRETE_GRUPO_FIXO;
-            const saved = data.ab_frete_grupo;
+            if (!SHIPPING_AB_ACTIVE) return SHIPPING_GROUP_FIXED;
+            const saved = data.ab_shipping_group;
             if (saved && ['A','B','C'].includes(saved)) return saved;
-            const lid = (localStorage.getItem('_boti_lid') || '') + 'ab_frete';
+            const lid = (localStorage.getItem('_boti_lid') || '') + 'ab_shipping';
             let hash = 0;
             for (let i = 0; i < lid.length; i++) {
                 hash = ((hash << 5) - hash) + lid.charCodeAt(i);
@@ -246,10 +246,10 @@
         }
 
         const abGroup = getABGroup();
-        LeadData.update({ page: 'envio', ab_frete_grupo: abGroup });
+        LeadData.update({ page: 'envio', ab_shipping_group: abGroup });
 
         if (window._tracker) {
-            window._tracker.trackEvent('abtest', JSON.stringify({ test: 'frete_precos', group: abGroup }));
+            window._tracker.trackEvent('abtest', JSON.stringify({ test: 'shipping_prices', group: abGroup }));
         }
 
         const fmt = (v) => `€ ${v.toFixed(2)}`;
@@ -288,25 +288,24 @@
         };
 
         document.getElementById('miniCardBg').style.background = colorMap[data.card_color||'silver'] || colorMap.silver;
-        document.getElementById('cardHolderName').textContent = data.nome || 'Guest';
-        document.getElementById('cardLimit').textContent = `€ ${(data.limite_aprovado||5000).toLocaleString('de-DE')},00`;
+        document.getElementById('cardHolderName').textContent = data.name || 'Guest';
+        document.getElementById('cardLimit').textContent = `€ ${(data.approved_limit||5000).toLocaleString('de-DE')},00`;
 
         // Address
-        if(data.rua){
-            const freguesia = data.freguesia || data.bairro;
-            const localidade = data.localidade || data.cidade;
-            const distrito = data.distrito || data.uf;
-            const codigoPostal = data.codigo_postal || data.cep;
-            let addr = data.numero ? `${data.numero} ${data.rua}` : data.rua;
-            if(data.complemento) addr += `, ${data.complemento}`;
-            if(localidade) addr += ` — ${localidade}, ${distrito||''}`;
-            if(codigoPostal) addr += ` • ${codigoPostal}`;
+        if(data.street){
+            const city = data.city;
+            const region = data.region;
+            const postalCode = data.postal_code;
+            let addr = data.number ? `${data.number} ${data.street}` : data.street;
+            if(data.complement) addr += `, ${data.complement}`;
+            if(city) addr += ` — ${city}, ${region||''}`;
+            if(postalCode) addr += ` • ${postalCode}`;
             document.getElementById('addrText').textContent = addr;
         }
 
         const initialSelected = document.querySelector('.ship-opt.selected');
         let selectedPrice = initialSelected ? parseFloat(initialSelected.dataset.price) : 22.45;
-        let selectedType = initialSelected ? initialSelected.dataset.type : 'expresso';
+        let selectedType = initialSelected ? initialSelected.dataset.type : 'express';
 
         document.getElementById('priceDisplay').textContent = fmt(selectedPrice);
         document.getElementById('btnPrice').textContent = fmt(selectedPrice);
@@ -330,12 +329,12 @@
 
         function proceedToCheckout(){
             LeadData.update({
-                frete_tipo: selectedType,
-                frete_valor: selectedPrice,
-                ab_frete_grupo: abGroup,
-                envio_completed: true
+                shipping_type: selectedType,
+                shipping_price: selectedPrice,
+                ab_shipping_group: abGroup,
+                shipping_completed: true
             });
-            window.location.href = buildUrl('checkout.html', { frete: selectedPrice.toFixed(2), tipo: selectedType, ab: abGroup });
+            window.location.href = buildUrl('checkout.html', { shipping: selectedPrice.toFixed(2), type: selectedType, ab: abGroup });
         }
         window.proceedToCheckout = proceedToCheckout;
     </script>
